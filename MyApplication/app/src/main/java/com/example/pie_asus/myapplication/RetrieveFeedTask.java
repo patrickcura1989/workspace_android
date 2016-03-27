@@ -1,6 +1,9 @@
 package com.example.pie_asus.myapplication;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.AsyncTask;
+import android.widget.TextView;
 
 import org.ccil.cowan.tagsoup.jaxp.SAXParserImpl;
 import org.xml.sax.Attributes;
@@ -19,11 +22,28 @@ import okhttp3.Response;
 /**
  * Created by PIE-ASUS on 24/03/2016.
  */
-class RetrieveFeedTask extends AsyncTask<Void, Void, Void>
+// http://developer.android.com/reference/android/os/AsyncTask.html
+class RetrieveFeedTask extends AsyncTask<Void, Void, String>
 {
-
-    OkHttpClient client = new OkHttpClient();
+    private OkHttpClient client = new OkHttpClient();
     private Exception exception;
+
+    private Context context;
+
+    private String searchResults = "";
+
+    private TextView tvSearchResults;
+
+    // http://stackoverflow.com/questions/10996479/how-to-update-a-textview-of-an-activity-from-another-classssss
+    public RetrieveFeedTask(Context context)
+    {
+        this.context = context;
+        this.tvSearchResults = (TextView)((Activity)(this.context)).findViewById(R.id.search_results);
+    }
+
+    public RetrieveFeedTask()
+    {
+    }
 
     String run(String url) throws IOException
     {
@@ -36,7 +56,7 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, Void>
     }
 
     @Override
-    protected Void doInBackground(Void... params)
+    protected String doInBackground(Void... params)
     {
         RetrieveFeedTask example = new RetrieveFeedTask();
         String response = null;
@@ -48,7 +68,7 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, Void>
         {
             e.printStackTrace();
         }
-        System.out.println(response);
+        //System.out.println(response);
         // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
         InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
 
@@ -70,8 +90,7 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, Void>
                                 {
                                     isName = true;
                                 }
-                            }
-                            else if (name.equalsIgnoreCase("p"))
+                            } else if (name.equalsIgnoreCase("p"))
                             {
                                 if ("price_list".equals(a.getValue("class")))
                                 {
@@ -84,15 +103,16 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, Void>
                         {
                             if (isName)
                             {
-                                System.out.println(
-                                        (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " "));
-                            }
-                            else if (isPrice)
+                                String content = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
+                                System.out.println(content);
+                                searchResults = searchResults + content + "\n";
+                            } else if (isPrice)
                             {
                                 if (priceCounter == 0)
                                 {
-                                    System.out.println(
-                                            (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " "));
+                                    String content = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
+                                    System.out.println(content);
+                                    searchResults = searchResults + content + "\n";
                                 }
                                 priceCounter++;
                             }
@@ -103,8 +123,7 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, Void>
                             if (isName)
                             {
                                 isName = false;
-                            }
-                            else if (isPrice)
+                            } else if (isPrice)
                             {
                                 isPrice = false;
                                 priceCounter = 0;
@@ -121,6 +140,11 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, Void>
             e.printStackTrace();
         }
 
-        return null;
+        return searchResults;
+    }
+
+    protected void onPostExecute(String result)
+    {
+        this.tvSearchResults.setText(result);
     }
 }
