@@ -30,15 +30,16 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
 
     private Context context;
 
-    private String searchResults = "";
+    private String searchResults = "", searchInput="";
 
     private TextView tvSearchResults;
 
     // http://stackoverflow.com/questions/10996479/how-to-update-a-textview-of-an-activity-from-another-classssss
-    public RetrieveFeedTask(Context context)
+    public RetrieveFeedTask(Context context, String searchInput)
     {
         this.context = context;
         this.tvSearchResults = (TextView)((Activity)(this.context)).findViewById(R.id.search_results);
+        this.searchInput = searchInput.replaceAll("\\s+","+");
     }
 
     public RetrieveFeedTask()
@@ -62,7 +63,7 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
         String response = null;
         try
         {
-            response = example.run("https://shop.jbhifi.co.nz/support.aspx?q=2tb+hard+drive+seagate");
+            response = example.run("https://shop.jbhifi.co.nz/support.aspx?q="+this.searchInput+"&source=all&sort=&plow=0&phigh=0&onsale=0&instock=0&len=10000");
         }
         catch (IOException e)
         {

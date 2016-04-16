@@ -1,5 +1,6 @@
 package com.example.pie_asus.myapplication;
 
+
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -12,6 +13,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener
@@ -23,9 +27,6 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        RetrieveFeedTask rft = new RetrieveFeedTask(this);
-        rft.execute();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -80,7 +81,12 @@ public class MainActivity extends AppCompatActivity
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        EditText searchInput = (EditText)findViewById(R.id.search_input);
+//        TextView searchResults = (TextView)findViewById(R.id.search_results);
+//        searchResults.setText((searchInput.getText()+"").replaceAll("\\s+","+"));
 
+        RetrieveFeedTask rft = new RetrieveFeedTask(this,searchInput.getText()+"");
+        rft.execute();
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings)
