@@ -189,23 +189,23 @@ public class MainActivity extends AppCompatPreferenceActivity
     protected boolean isValidFragment(String fragmentName)
     {
         return PreferenceFragment.class.getName().equals(fragmentName)
-                || GeneralPreferenceFragment.class.getName().equals(fragmentName)
+                || PerformSearchPreferenceFragment.class.getName().equals(fragmentName)
                 || DataSyncPreferenceFragment.class.getName().equals(fragmentName)
                 || NotificationPreferenceFragment.class.getName().equals(fragmentName);
     }
 
     /**
-     * This fragment shows general preferences only. It is used when the
+     * This fragment shows Perform Search preferences only. It is used when the
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class GeneralPreferenceFragment extends PreferenceFragment
+    public static class PerformSearchPreferenceFragment extends PreferenceFragment
     {
         @Override
         public void onCreate(Bundle savedInstanceState)
         {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_general);
+            addPreferencesFromResource(R.xml.pref_performsearch);
             setHasOptionsMenu(true);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
@@ -218,25 +218,35 @@ public class MainActivity extends AppCompatPreferenceActivity
             PreferenceScreen screen = this.getPreferenceScreen(); // "null". See onViewCreated.
 
             // Create the Preferences Manually - so that the key can be set programatically.
-            PreferenceCategory category = new PreferenceCategory(screen.getContext());
-            category.setTitle("Channel Configuration");
-            screen.addPreference(category);
+            PreferenceCategory searchResults = new PreferenceCategory(screen.getContext());
+            searchResults.setTitle("Search Results");
+            screen.addPreference(searchResults);
 
-            CheckBoxPreference checkBoxPref = new CheckBoxPreference(screen.getContext());
-            checkBoxPref.setKey("checkBoxPref_name");
-            checkBoxPref.setTitle("checkBoxPref_shortName");
-            checkBoxPref.setSummary("checkBoxPref");
-            checkBoxPref.setChecked(true);
+            Preference result = new Preference(screen.getContext());
+            result.setKey("pref_name");
+            result.setTitle("Seagate 2TB Hard Drive");
+            result.setSummary("$30.00");
 
-            category.addPreference(checkBoxPref);
+            searchResults.addPreference(result);
 
+            Preference pref = findPreference("example_text");
+            pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 
+                @Override
+                public boolean onPreferenceChange(Preference preference,
+                                                  Object newValue) {
+                    Log.println(Log.ERROR,"log","hello");
+                    return true;
+                }
+
+            });
         }
 
         @Override
         public boolean onOptionsItemSelected(MenuItem item)
         {
             int id = item.getItemId();
+
             if (id == android.R.id.home)
             {
                 startActivity(new Intent(getActivity(), MainActivity.class));

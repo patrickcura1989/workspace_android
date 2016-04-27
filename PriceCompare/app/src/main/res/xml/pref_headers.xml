@@ -3,9 +3,9 @@
     <!-- These settings headers are only used on tablets. -->
 
     <header
-        android:fragment="com.example.pie_asus.pricecompare.MainActivity$GeneralPreferenceFragment"
+        android:fragment="com.example.pie_asus.pricecompare.MainActivity$PerformSearchPreferenceFragment"
         android:icon="@drawable/ic_info_black_24dp"
-        android:title="@string/pref_header_general"/>
+        android:title="@string/pref_header_performsearch"/>
 
     <header
         android:fragment="com.example.pie_asus.pricecompare.MainActivity$NotificationPreferenceFragment"
