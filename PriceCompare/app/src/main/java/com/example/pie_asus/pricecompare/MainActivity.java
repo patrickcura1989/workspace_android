@@ -1,6 +1,7 @@
 /*
 References:
 http://stackoverflow.com/questions/17255383/how-do-i-programmatically-add-edittextpreferences-to-my-preferencefragment
+http://stackoverflow.com/questions/12737724/how-to-use-setonpreferencechangelistener-for-quietlycoding-numberpicker
 
 Log.println(Log.ERROR,"log","hello");
  */
@@ -215,27 +216,16 @@ public class MainActivity extends AppCompatPreferenceActivity
             bindPreferenceSummaryToValue(findPreference("example_text"));
             bindPreferenceSummaryToValue(findPreference("example_list"));
 
-            PreferenceScreen screen = this.getPreferenceScreen(); // "null". See onViewCreated.
-
-            // Create the Preferences Manually - so that the key can be set programatically.
-            PreferenceCategory searchResults = new PreferenceCategory(screen.getContext());
-            searchResults.setTitle("Search Results");
-            screen.addPreference(searchResults);
-
-            Preference result = new Preference(screen.getContext());
-            result.setKey("pref_name");
-            result.setTitle("Seagate 2TB Hard Drive");
-            result.setSummary("$30.00");
-
-            searchResults.addPreference(result);
-
             Preference pref = findPreference("example_text");
             pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 
                 @Override
                 public boolean onPreferenceChange(Preference preference,
                                                   Object newValue) {
-                    Log.println(Log.ERROR,"log","hello");
+                    //Log.println(Log.ERROR,"log","hello");
+                    RetrieveFeedTask rft = new RetrieveFeedTask(preference, newValue+"");
+
+                    rft.execute();
                     return true;
                 }
 

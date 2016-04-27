@@ -12,6 +12,11 @@
         android:singleLine="true"
         android:title="@string/pref_title_keyword"/>
 
+    <PreferenceCategory
+        android:title="@string/pref_search_results_title"
+        android:key="pref_key_search_results">
+    </PreferenceCategory>
+
     <SwitchPreference
         android:defaultValue="true"
         android:key="example_switch"
