@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -73,7 +72,7 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
         {
             e.printStackTrace();
         }
-        //System.out.println(response);
+
         // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
         InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
 
@@ -152,10 +151,9 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
 
     protected void onPostExecute(String result)
     {
-        Log.println(Log.ERROR,"log",result);
-
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_search_results");
+        preferenceCategory.removeAll();
 
         String[] resultsArray = result.split("\\$");
 
@@ -174,13 +172,15 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
             }
         }
 
-        for(int i=0; i<nameResultsArray.size(); i++)
+        for(int i=0; i<priceResultsArray.size(); i++)
         {
             Preference resultPreference = new Preference(preference.getContext());
             resultPreference.setKey("pref_name");
             resultPreference.setTitle(nameResultsArray.get(i));
             resultPreference.setSummary(priceResultsArray.get(i));
             preferenceCategory.addPreference(resultPreference);
+
+            //Log.println(Log.ERROR,"log","******"+result+"++++++++");
         }
 
     }

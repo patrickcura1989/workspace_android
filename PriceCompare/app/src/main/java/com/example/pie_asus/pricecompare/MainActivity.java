@@ -222,7 +222,8 @@ public class MainActivity extends AppCompatPreferenceActivity
                 @Override
                 public boolean onPreferenceChange(Preference preference,
                                                   Object newValue) {
-                    //Log.println(Log.ERROR,"log","hello");
+                    Log.println(Log.ERROR,"log","******"+newValue+"++++++++");
+                    preference.setSummary(newValue+"");
                     RetrieveFeedTask rft = new RetrieveFeedTask(preference, newValue+"");
 
                     rft.execute();
