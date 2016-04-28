@@ -214,15 +214,14 @@ public class MainActivity extends AppCompatPreferenceActivity
             // updated to reflect the new value, per the Android Design
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
 
-            Preference pref = findPreference("example_text");
+            final Preference pref = findPreference("example_text");
             pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 
                 @Override
                 public boolean onPreferenceChange(Preference preference,
                                                   Object newValue) {
-                    Log.println(Log.ERROR,"log","******"+newValue+"++++++++");
+                    //Log.println(Log.ERROR,"log","hello");
                     preference.setSummary(newValue+"");
                     RetrieveFeedTask rft = new RetrieveFeedTask(preference, newValue+"");
 
@@ -244,6 +243,12 @@ public class MainActivity extends AppCompatPreferenceActivity
                 return true;
             }
             return super.onOptionsItemSelected(item);
+        }
+
+        @Override
+        public onBuildHeaders()
+        {
+
         }
     }
 

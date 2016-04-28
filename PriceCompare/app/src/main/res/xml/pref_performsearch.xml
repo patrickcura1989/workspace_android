@@ -1,7 +1,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- NOTE: EditTextPreference accepts EditText attributes. -->
-    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code. -->
+    <!-- NOTE: EditTextPreference's summary should be set to its value by the activity code.
+    http://developer.android.com/guide/topics/ui/settings.html-->
     <EditTextPreference
         android:capitalize="words"
         android:defaultValue="@string/pref_default_keyword"
@@ -17,22 +18,19 @@
         android:key="pref_key_search_results">
     </PreferenceCategory>
 
-    <SwitchPreference
-        android:defaultValue="true"
-        android:key="example_switch"
-        android:summary="@string/pref_description_social_recommendations"
-        android:title="@string/pref_title_social_recommendations"/>
+    <PreferenceScreen
+        android:key="pref_category_search_results_key"
+        android:title="@string/pref_jbhifi_title"
+        android:persistent="false">
 
-    <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
-         dismiss it. -->
-    <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
-    <ListPreference
-        android:defaultValue="-1"
-        android:entries="@array/pref_example_list_titles"
-        android:entryValues="@array/pref_example_list_values"
-        android:key="example_list"
-        android:negativeButtonText="@null"
-        android:positiveButtonText="@null"
-        android:title="@string/pref_title_add_friends_to_messages"/>
+    <PreferenceScreen
+            android:key="pref_key_jbhifi"
+            android:title="@string/pref_jbhifi_title"
+            android:persistent="false">
+
+        </PreferenceScreen>
+
+
+    </PreferenceScreen>
 
 </PreferenceScreen>
