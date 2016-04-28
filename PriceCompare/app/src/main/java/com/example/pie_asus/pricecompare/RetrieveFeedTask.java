@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -33,10 +34,7 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
 
     private Context context;
 
-    private String searchResults = "", searchInput="";
-
-    private ArrayList<String> nameResultsArray = new ArrayList<String>();
-    private ArrayList<String> priceResultsArray = new ArrayList<String>();
+    private String searchResults = "", searchInput="", searchResultsForParsing="";
 
     private Preference preference;
 
@@ -113,7 +111,7 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
                                 String content = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
                                 System.out.println(content);
                                 searchResults = searchResults + content + "\n";
-                                nameResultsArray.add(content);
+                                searchResultsForParsing = searchResultsForParsing + content + " ";
                             } else if (isPrice)
                             {
                                 if (priceCounter == 0)
@@ -121,7 +119,7 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
                                     String content = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
                                     System.out.println(content);
                                     searchResults = searchResults + content + "\n";
-                                    priceResultsArray.add(content);
+                                    searchResultsForParsing = searchResultsForParsing + content + "$";
                                 }
                                 priceCounter++;
                             }
@@ -149,7 +147,7 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
             e.printStackTrace();
         }
 
-        return searchResults;
+        return searchResultsForParsing;
     }
 
     protected void onPostExecute(String result)
@@ -159,7 +157,22 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_search_results");
 
-        //this.tvSearchResults.setText(result);
+        String[] resultsArray = result.split("\\$");
+
+        ArrayList<String> nameResultsArray = new ArrayList<String>();
+        ArrayList<String> priceResultsArray = new ArrayList<String>();
+
+        for(int i=0; i<resultsArray.length; i++)
+        {
+            if(i%2==0)
+            {
+                nameResultsArray.add(resultsArray[i]);
+            }
+            else
+            {
+                priceResultsArray.add(resultsArray[i]);
+            }
+        }
 
         for(int i=0; i<nameResultsArray.size(); i++)
         {
