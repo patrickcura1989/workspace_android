@@ -12,25 +12,23 @@ package com.example.pie_asus.pricecompare;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.preference.CheckBoxPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.PreferenceScreen;
 import android.preference.RingtonePreference;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.MenuItem;
+import android.webkit.WebView;
 
 import java.util.List;
 
@@ -47,6 +45,8 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatPreferenceActivity
 {
+
+
     /**
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
@@ -223,9 +223,12 @@ public class MainActivity extends AppCompatPreferenceActivity
                                                   Object newValue) {
                     //Log.println(Log.ERROR,"log","hello");
                     preference.setSummary(newValue+"");
-                    RetrieveFeedTask rft = new RetrieveFeedTask(preference, newValue+"");
 
-                    rft.execute();
+                    jbhifiRetrieveFeedTask jbhihiRFT = new jbhifiRetrieveFeedTask(preference, newValue+"");
+                    pbtechRetrieveFeedTask pbtechRFT = new pbtechRetrieveFeedTask(preference, newValue+"");
+
+                    jbhihiRFT.execute();
+                    pbtechRFT.execute();
                     return true;
                 }
 
@@ -245,11 +248,6 @@ public class MainActivity extends AppCompatPreferenceActivity
             return super.onOptionsItemSelected(item);
         }
 
-        @Override
-        public onBuildHeaders()
-        {
-
-        }
     }
 
     /**

@@ -1,11 +1,12 @@
 package com.example.pie_asus.pricecompare;
 
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import org.ccil.cowan.tagsoup.jaxp.SAXParserImpl;
 import org.xml.sax.Attributes;
@@ -24,28 +25,29 @@ import okhttp3.Response;
 
 /**
  * Created by PIE-ASUS on 24/03/2016.
+ * http://stackoverflow.com/questions/17634643/how-to-add-a-hyperlink-into-a-preference-screen-preferenceactivity
+ * http://developer.android.com/reference/android/os/AsyncTask.html
  */
-// http://developer.android.com/reference/android/os/AsyncTask.html
-class RetrieveFeedTask extends AsyncTask<Void, Void, String>
+
+class jbhifiRetrieveFeedTask extends AsyncTask<Void, Void, String>
 {
     private OkHttpClient client = new OkHttpClient();
     private Exception exception;
 
     private Context context;
 
-    private String searchResults = "", searchInput="", searchResultsForParsing="";
+    private String searchResults = "", searchInput = "", searchResultsForParsing = "";
 
     private Preference preference;
 
     // http://stackoverflow.com/questions/10996479/how-to-update-a-textview-of-an-activity-from-another-classssss
-    public RetrieveFeedTask(Preference preference, String searchInput)
+    public jbhifiRetrieveFeedTask(Preference preference, String searchInput)
     {
-        this.context = context;
         this.preference = preference;
-        this.searchInput = searchInput.replaceAll("\\s+","+");
+        this.searchInput = searchInput.replaceAll("\\s+", "+");
     }
 
-    public RetrieveFeedTask()
+    public jbhifiRetrieveFeedTask()
     {
     }
 
@@ -62,11 +64,11 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
     @Override
     protected String doInBackground(Void... params)
     {
-        RetrieveFeedTask example = new RetrieveFeedTask();
+        jbhifiRetrieveFeedTask example = new jbhifiRetrieveFeedTask();
         String response = null;
         try
         {
-            response = example.run("https://shop.jbhifi.co.nz/support.aspx?q="+this.searchInput+"&source=all&sort=&plow=0&phigh=0&onsale=0&instock=0&len=10000");
+            response = example.run("https://shop.jbhifi.co.nz/support.aspx?q=" + this.searchInput + "&source=all&sort=price_lh&plow=0&phigh=0&onsale=0&instock=0&len=10000");
         }
         catch (IOException e)
         {
@@ -94,13 +96,22 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
                                 {
                                     isName = true;
                                 }
-                            } else if (name.equalsIgnoreCase("p"))
+                            }
+                            else if (name.equalsIgnoreCase("p"))
                             {
                                 if ("price_list".equals(a.getValue("class")))
                                 {
                                     isPrice = true;
                                 }
                             }
+                            else if (name.equalsIgnoreCase("a"))
+                            {
+                                if ("image_list".equals(a.getValue("class")))
+                                {
+                                    searchResultsForParsing = searchResultsForParsing + "https://shop.jbhifi.co.nz"+a.getValue("href") + "$";
+                                }
+                            }
+
                         }
 
                         public void characters(char[] ch, int start, int length)
@@ -108,15 +119,16 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
                             if (isName)
                             {
                                 String content = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
-                                System.out.println(content);
+                                //System.out.println(content);
                                 searchResults = searchResults + content + "\n";
                                 searchResultsForParsing = searchResultsForParsing + content + " ";
-                            } else if (isPrice)
+                            }
+                            else if (isPrice)
                             {
                                 if (priceCounter == 0)
                                 {
                                     String content = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
-                                    System.out.println(content);
+                                    //System.out.println(content);
                                     searchResults = searchResults + content + "\n";
                                     searchResultsForParsing = searchResultsForParsing + content + "$";
                                 }
@@ -129,7 +141,8 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
                             if (isName)
                             {
                                 isName = false;
-                            } else if (isPrice)
+                            }
+                            else if (isPrice)
                             {
                                 isPrice = false;
                                 priceCounter = 0;
@@ -152,34 +165,42 @@ class RetrieveFeedTask extends AsyncTask<Void, Void, String>
     protected void onPostExecute(String result)
     {
         PreferenceManager preferenceManager = preference.getPreferenceManager();
-        PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_search_results");
+        PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_jbhifi_search_results");
         preferenceCategory.removeAll();
 
         String[] resultsArray = result.split("\\$");
 
         ArrayList<String> nameResultsArray = new ArrayList<String>();
         ArrayList<String> priceResultsArray = new ArrayList<String>();
+        ArrayList<String> urlResultsArray = new ArrayList<String>();
 
-        for(int i=0; i<resultsArray.length; i++)
+        for (int i = 0; i < resultsArray.length; i++)
         {
-            if(i%2==0)
+            if (i % 3 == 0)
+            {
+                urlResultsArray.add(resultsArray[i]);
+            }
+            else if (i % 3 == 1)
             {
                 nameResultsArray.add(resultsArray[i]);
             }
-            else
+            else if (i % 3 == 2)
             {
                 priceResultsArray.add(resultsArray[i]);
             }
         }
 
-        for(int i=0; i<priceResultsArray.size(); i++)
+        for (int i = 0; i < priceResultsArray.size(); i++)
         {
             Preference resultPreference = new Preference(preference.getContext());
             resultPreference.setKey("pref_name");
             resultPreference.setTitle(nameResultsArray.get(i));
             resultPreference.setSummary(priceResultsArray.get(i));
+            Intent redirect = new Intent();
+            redirect.setData(Uri.parse(urlResultsArray.get(i)));
+            redirect.setAction("android.intent.action.VIEW");
+            resultPreference.setIntent(redirect);
             preferenceCategory.addPreference(resultPreference);
-
             //Log.println(Log.ERROR,"log","******"+result+"++++++++");
         }
 

@@ -61,5 +61,9 @@
 
     <string name="pref_search_results_title">Search Results</string>
 
-    <string name="pref_jbhifi_title">JBHifi</string>
+    <string name="pref_jbhifi_search_results_title">JB Hi-Fi Search Results</string>
+    <string name="pref_jbhifi_title">JB Hi-Fi</string>
+
+    <string name="pref_pbtech_search_results_title">PB Tech Search Results</string>
+    <string name="pref_pbtech_title">PB Tech</string>
 </resources>

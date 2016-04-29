@@ -23,14 +23,21 @@
         android:title="@string/pref_jbhifi_title"
         android:persistent="false">
 
+        <PreferenceCategory
+            android:title="@string/pref_jbhifi_search_results_title"
+            android:key="pref_key_jbhifi_search_results">
+        </PreferenceCategory>
+    </PreferenceScreen>
+
     <PreferenceScreen
-            android:key="pref_key_jbhifi"
-            android:title="@string/pref_jbhifi_title"
-            android:persistent="false">
+        android:key="pref_category_search_results_key"
+        android:title="@string/pref_pbtech_title"
+        android:persistent="false">
 
-        </PreferenceScreen>
-
-
+        <PreferenceCategory
+            android:title="@string/pref_pbtech_search_results_title"
+            android:key="pref_key_pbtech_search_results">
+        </PreferenceCategory>
     </PreferenceScreen>
 
 </PreferenceScreen>
