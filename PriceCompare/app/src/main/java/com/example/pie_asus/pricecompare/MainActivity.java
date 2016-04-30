@@ -359,7 +359,7 @@ public class MainActivity extends AppCompatPreferenceActivity
                             }
                             counter++;                        }
                     });
-                    webview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + "2tb" + "&p=search&o=price&d=a");
+                    webview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + newValue + "&p=search&o=price&d=a");
 
 
 
