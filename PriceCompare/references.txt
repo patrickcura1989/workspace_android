@@ -20,10 +20,7 @@ http://stackoverflow.com/questions/17255383/how-do-i-programmatically-add-editte
 var ddl = document.getElementsByClassName('rec_num');
 var opts = ddl[0].options.length;
 for (var i=0; i<opts; i++){
-    if (ddl[0].options[i].value == "240"){
-        ddl[0].options[i].selected = true;
-        break;
-    }
+    ddl[0].options[i].value = 9000;
 }
 
 var evt = document.createEvent("HTMLEvents");
