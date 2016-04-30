@@ -249,114 +249,118 @@ public class MainActivity extends AppCompatPreferenceActivity
 
                     webview.setWebViewClient(new WebViewClient()
                     {
+                        int counter = 0;
                         @Override
                         public void onPageFinished(WebView view, String url)
                         {
-                            Log.println(Log.ERROR, "log", "******" + url + "++++++++");
-                            webview.evaluateJavascript("var ddl = document.getElementsByClassName('rec_num');\n" +
-                                    "var opts = ddl[0].options.length;\n" +
-                                    "for (var i=0; i<opts; i++){\n" +
-                                    "    if (ddl[0].options[i].value == \"240\"){\n" +
-                                    "        ddl[0].options[i].selected = true;\n" +
-                                    "        break;\n" +
-                                    "    }\n" +
-                                    "}\n" +
-                                    "\n" +
-                                    "var evt = document.createEvent(\"HTMLEvents\");\n" +
-                                    "evt.initEvent(\"change\", false, true);\n" +
-                                    "ddl[0].dispatchEvent(evt);\n" +
-                                    "\n", new ValueCallback<String>()
+                            if (counter < 1)
                             {
-                                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-                                @Override
-                                public void onReceiveValue(String s)
+                                Log.println(Log.ERROR, "log", "******" + url + "++++++++");
+                                webview.evaluateJavascript("var ddl = document.getElementsByClassName('rec_num');\n" +
+                                        "var opts = ddl[0].options.length;\n" +
+                                        "for (var i=0; i<opts; i++){\n" +
+                                        "    if (ddl[0].options[i].value == \"240\"){\n" +
+                                        "        ddl[0].options[i].selected = true;\n" +
+                                        "        break;\n" +
+                                        "    }\n" +
+                                        "}\n" +
+                                        "\n" +
+                                        "var evt = document.createEvent(\"HTMLEvents\");\n" +
+                                        "evt.initEvent(\"change\", false, true);\n" +
+                                        "ddl[0].dispatchEvent(evt);\n" +
+                                        "\n", new ValueCallback<String>()
                                 {
-                                    JsonReader reader = new JsonReader(new StringReader(s));
+                                    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                                    @Override
+                                    public void onReceiveValue(String s)
+                                    {
+                                        JsonReader reader = new JsonReader(new StringReader(s));
 
-                                    // Must set lenient to parse single values
-                                    reader.setLenient(true);
+                                        // Must set lenient to parse single values
+                                        reader.setLenient(true);
 
-                                    try
-                                    {
-                                        if (reader.peek() != JsonToken.NULL)
-                                        {
-                                            if (reader.peek() == JsonToken.STRING)
-                                            {
-                                            }
-                                        }
-                                    }
-                                    catch (IOException e)
-                                    {
-                                        Log.e("TAG", "MainActivity: IOException", e);
-                                    } finally
-                                    {
                                         try
                                         {
-                                            reader.close();
+                                            if (reader.peek() != JsonToken.NULL)
+                                            {
+                                                if (reader.peek() == JsonToken.STRING)
+                                                {
+                                                }
+                                            }
                                         }
                                         catch (IOException e)
                                         {
-                                            // NOOP
-                                        }
-                                    }
-                                }
-                            });
-                            webview.evaluateJavascript(
-                                    "'<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';", new ValueCallback<String>()
-                                    {
-                                        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-                                        @Override
-                                        public void onReceiveValue(String s)
+                                            Log.e("TAG", "MainActivity: IOException", e);
+                                        } finally
                                         {
-                                            JsonReader reader = new JsonReader(new StringReader(s));
-
-                                            // Must set lenient to parse single values
-                                            reader.setLenient(true);
-
                                             try
                                             {
-                                                if (reader.peek() != JsonToken.NULL)
-                                                {
-                                                    if (reader.peek() == JsonToken.STRING)
-                                                    {
-                                                        String msg = reader.nextString();
-                                                        pbtechRetrieveFeedTask2 pbtechRFT = new pbtechRetrieveFeedTask2(pref, msg);
-                                                        pbtechRFT.execute();
-                                                        if (msg != null)
-                                                        {
-                                                            Toast.makeText(webview.getContext(), msg, Toast.LENGTH_LONG).show();
-                                                            File file = new File(Environment.getExternalStorageDirectory() + File.separator + "test.html");
-                                                            file.createNewFile();
-
-                                                            //write the bytes in file
-                                                            if (file.exists())
-                                                            {
-                                                                OutputStream fo = new FileOutputStream(file);
-                                                                fo.write(msg.getBytes());
-                                                                fo.close();
-                                                            }
-
-                                                        }
-                                                    }
-                                                }
+                                                reader.close();
                                             }
                                             catch (IOException e)
                                             {
-                                                Log.e("TAG", "MainActivity: IOException", e);
-                                            } finally
+                                                // NOOP
+                                            }
+                                        }
+                                    }
+                                });
+                                webview.evaluateJavascript(
+                                        "'<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';", new ValueCallback<String>()
+                                        {
+                                            @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                                            @Override
+                                            public void onReceiveValue(String s)
                                             {
+                                                JsonReader reader = new JsonReader(new StringReader(s));
+
+                                                // Must set lenient to parse single values
+                                                reader.setLenient(true);
+
                                                 try
                                                 {
-                                                    reader.close();
+                                                    if (reader.peek() != JsonToken.NULL)
+                                                    {
+                                                        if (reader.peek() == JsonToken.STRING)
+                                                        {
+                                                            String msg = reader.nextString();
+                                                            pbtechRetrieveFeedTask2 pbtechRFT = new pbtechRetrieveFeedTask2(pref, msg);
+                                                            pbtechRFT.execute();
+                                                            if (msg != null)
+                                                            {
+                                                                Toast.makeText(webview.getContext(), msg, Toast.LENGTH_LONG).show();
+                                                                File file = new File(Environment.getExternalStorageDirectory() + File.separator + "test.html");
+                                                                file.createNewFile();
+
+                                                                //write the bytes in file
+                                                                if (file.exists())
+                                                                {
+                                                                    OutputStream fo = new FileOutputStream(file);
+                                                                    fo.write(msg.getBytes());
+                                                                    fo.close();
+                                                                }
+
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                                 catch (IOException e)
                                                 {
-                                                    // NOOP
+                                                    Log.e("TAG", "MainActivity: IOException", e);
+                                                } finally
+                                                {
+                                                    try
+                                                    {
+                                                        reader.close();
+                                                    }
+                                                    catch (IOException e)
+                                                    {
+                                                        // NOOP
+                                                    }
                                                 }
                                             }
-                                        }
-                                    });
-                        }
+                                        });
+                            }
+                            counter++;                        }
                     });
                     webview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + "2tb" + "&p=search&o=price&d=a");
 
