@@ -58,6 +58,10 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
     private Preference preference;
 
 
+    ArrayList<String> nameResultsArray = new ArrayList<String>();
+    ArrayList<String> priceResultsArray = new ArrayList<String>();
+    ArrayList<String> urlResultsArray = new ArrayList<String>();
+
     // http://stackoverflow.com/questions/10996479/how-to-update-a-textview-of-an-activity-from-another-classssss
     @SuppressLint("JavascriptInterface")
     public pbtechRetrieveFeedTask2(Preference preference, String htmlCode)
@@ -79,10 +83,10 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
                     {
                         private boolean isName = false;
                         private boolean isPrice = false;
-                        private boolean isPriceU = false;
+                        private boolean isPriceAll = false;
                         private boolean isTD = false;
                         private int priceCounter = 0;
-                        private String price = "";
+                        private String price = "", productNameFull = "", priceAllValue="";
 
                         public void startElement(String uri, String localName, String name, Attributes a)
                         {
@@ -99,8 +103,9 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
                                 if (isTD)
                                 {
                                     isTD = false;
-                                    searchResultsForParsing = searchResultsForParsing + a.getValue("href") + "$";
+                                    searchResultsForParsing += a.getValue("href") + "\n";
                                     //System.out.println(a.getValue("href"));
+                                    urlResultsArray.add( a.getValue("href"));
                                 }
                             }
                             else if (name.equalsIgnoreCase("span"))
@@ -110,13 +115,14 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
                                     priceCounter++;
                                     //System.out.println(priceCounter + " start");
                                     isPrice = true;
+                                    isPriceAll = false;
                                 }
                             }
                             else if (name.equalsIgnoreCase("td"))
                             {
                                 if ("explistm_price".equals(a.getValue("class")))
                                 {
-                                    isPriceU = true;
+                                    isPriceAll = true;
                                 }
                             }
                         }
@@ -126,25 +132,22 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
                             if (isName)
                             {
                                 String productName = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
-                                System.out.println(productName);
-                                searchResultsForParsing += productName ;
+                                //System.out.println(productName);
+                                productNameFull+=productName;
                             }
                             else if (isPrice)
                             {
                                 if (priceCounter >= 2)
                                 {
-                                    System.out.println((new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " "));
+                                    //System.out.println((new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " "));
                                     price = price + (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ") + ".";
                                 }
                             }
-                            else if (isPriceU)
+                            else if (isPriceAll)
                             {
-                                String isPriceUS = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
-                                if("Unavailable".equals(isPriceUS))
-                                {
-                                    searchResultsForParsing += "$" + isPriceUS + "$";
-                                }
-                                System.out.println("isPriceU: " + isPriceUS);
+                                String priceAll = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
+                                //System.out.println(productName);
+                                priceAllValue+=priceAll;
                             }
                         }
 
@@ -153,6 +156,9 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
                             if (isName)
                             {
                                 isName = false;
+                                searchResultsForParsing += productNameFull + "\n";
+                                nameResultsArray.add(productNameFull);
+                                productNameFull = "";
                             }
                             else if (isPrice)
                             {
@@ -161,14 +167,21 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
                                 if (priceCounter >= 2)
                                 {
                                     price = price.substring(0, price.length() - 1);
-                                    searchResultsForParsing += price + "$";
+                                    searchResultsForParsing += price + "\n";
+                                    priceResultsArray.add(price);
                                     priceCounter = 0;
                                     price = "";
                                 }
                             }
-                            else if (isPriceU)
+                            else if (isPriceAll)
                             {
-                                isPriceU = false;
+                                isPriceAll = false;
+                                if(priceAllValue.matches("(.*)vail(.*)"))
+                                {
+                                    searchResultsForParsing += priceAllValue + "\n";
+                                    priceResultsArray.add(priceAllValue);
+                                }
+                                priceAllValue = "";
                             }
                         }
                     });
@@ -188,31 +201,28 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
     protected void onPostExecute(String result)
     {
         //Log.println(Log.ERROR, "log", "******RESULT" + result + "++++++++");
+        System.out.println(result);
+        File file = new File(Environment.getExternalStorageDirectory() + File.separator + "parse.txt");
+        try
+        {
+            file.createNewFile();
+            //write the bytes in file
+            if (file.exists())
+            {
+                OutputStream fo = new FileOutputStream(file);
+                fo.write(result.getBytes());
+                fo.close();
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_pbtech_search_results");
         preferenceCategory.removeAll();
 
-        String[] resultsArray = result.split("\\$");
-
-        ArrayList<String> nameResultsArray = new ArrayList<String>();
-        ArrayList<String> priceResultsArray = new ArrayList<String>();
-        ArrayList<String> urlResultsArray = new ArrayList<String>();
-
-        for (int i = 0; i < resultsArray.length; i++)
-        {
-            if (i % 3 == 0)
-            {
-                urlResultsArray.add(resultsArray[i]);
-            }
-            else if (i % 3 == 1)
-            {
-                nameResultsArray.add(resultsArray[i]);
-            }
-            else if (i % 3 == 2)
-            {
-                priceResultsArray.add(resultsArray[i]);
-            }
-        }
 
         for (int i = 0; i < nameResultsArray.size(); i++)
         {
