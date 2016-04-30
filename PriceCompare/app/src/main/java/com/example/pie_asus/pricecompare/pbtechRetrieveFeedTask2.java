@@ -126,14 +126,14 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
                             if (isName)
                             {
                                 String productName = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
-                                //System.out.println(productName);
+                                System.out.println(productName);
                                 searchResultsForParsing += productName ;
                             }
                             else if (isPrice)
                             {
                                 if (priceCounter >= 2)
                                 {
-                                    //System.out.println( priceCounter + " " + (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " "));
+                                    System.out.println((new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " "));
                                     price = price + (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ") + ".";
                                 }
                             }
@@ -144,6 +144,7 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
                                 {
                                     searchResultsForParsing += "$" + isPriceUS + "$";
                                 }
+                                System.out.println("isPriceU: " + isPriceUS);
                             }
                         }
 
@@ -186,7 +187,7 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
 
     protected void onPostExecute(String result)
     {
-        Log.println(Log.ERROR, "log", "******RESULT" + result + "++++++++");
+        //Log.println(Log.ERROR, "log", "******RESULT" + result + "++++++++");
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_pbtech_search_results");
         preferenceCategory.removeAll();

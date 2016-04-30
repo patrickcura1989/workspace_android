@@ -2,6 +2,7 @@
 References:
 http://stackoverflow.com/questions/17255383/how-do-i-programmatically-add-edittextpreferences-to-my-preferencefragment
 http://stackoverflow.com/questions/12737724/how-to-use-setonpreferencechangelistener-for-quietlycoding-numberpicker
+http://stackoverflow.com/questions/25544609/javascript-change-dropdown-list-value#25544845
 
 Log.println(Log.ERROR,"log","hello");
  */
@@ -255,8 +256,22 @@ public class MainActivity extends AppCompatPreferenceActivity
                         {
                             if (counter < 1)
                             {
-                                Log.println(Log.ERROR, "log", "******" + url + "++++++++");
-                                webview.evaluateJavascript("var ddl = document.getElementsByClassName('rec_num');\n" +
+                                //Log.println(Log.ERROR, "log", "******" + url + "++++++++");
+                                webview.evaluateJavascript(
+                                        "var ddl1 = document.getElementById('cate_sort_by');\n" +
+                                        "var opts1 = ddl1.options.length;\n" +
+                                        "for (var i = 0; i < opts1; i++) {\n" +
+                                        "    if (ddl1.options[i].value == \"price|a\") {\n" +
+                                        "        ddl1.options[i].selected = true;\n" +
+                                        "        break;\n" +
+                                        "    }\n" +
+                                        "} \n" +
+                                        "\n" +
+                                        "var evt1 = document.createEvent(\"HTMLEvents\");\n" +
+                                        "evt1.initEvent(\"change\", false, true);\n" +
+                                        "ddl1.dispatchEvent(evt1);\n" +
+                                        "\n" +
+                                        "var ddl = document.getElementsByClassName('rec_num');\n" +
                                         "var opts = ddl[0].options.length;\n" +
                                         "for (var i=0; i<opts; i++){\n" +
                                         "    ddl[0].options[i].value = 9000; \n" +
@@ -324,10 +339,10 @@ public class MainActivity extends AppCompatPreferenceActivity
                                                             pbtechRFT.execute();
                                                             if (msg != null)
                                                             {
+
                                                                 Toast.makeText(webview.getContext(), msg, Toast.LENGTH_LONG).show();
                                                                 File file = new File(Environment.getExternalStorageDirectory() + File.separator + "test.html");
                                                                 file.createNewFile();
-
                                                                 //write the bytes in file
                                                                 if (file.exists())
                                                                 {

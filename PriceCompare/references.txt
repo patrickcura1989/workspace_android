@@ -17,6 +17,28 @@ http://stackoverflow.com/questions/6129384/programatically-populating-preference
 
 http://stackoverflow.com/questions/17255383/how-do-i-programmatically-add-edittextpreferences-to-my-preferencefragment
 
+
+var cb = document.getElementById('stock');
+cb.checked = true;
+
+var evt0 = document.createEvent("HTMLEvents");
+evt0.initEvent("click", false, true);
+cb.dispatchEvent(evt0);
+
+
+var ddl1 = document.getElementById('cate_sort_by');
+var opts1 = ddl1.options.length;
+for (var i = 0; i < opts1; i++) {
+    if (ddl1.options[i].value == "price|a") {
+        ddl1.options[i].selected = true;
+        break;
+    }
+} 
+
+var evt1 = document.createEvent("HTMLEvents");
+evt1.initEvent("change", false, true);
+ddl1.dispatchEvent(evt1);
+
 var ddl = document.getElementsByClassName('rec_num');
 var opts = ddl[0].options.length;
 for (var i=0; i<opts; i++){
@@ -28,3 +50,4 @@ evt.initEvent("change", false, true);
 ddl[0].dispatchEvent(evt);
 
 '<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';
+
