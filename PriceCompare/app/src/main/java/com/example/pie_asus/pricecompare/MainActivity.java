@@ -259,10 +259,7 @@ public class MainActivity extends AppCompatPreferenceActivity
                                 webview.evaluateJavascript("var ddl = document.getElementsByClassName('rec_num');\n" +
                                         "var opts = ddl[0].options.length;\n" +
                                         "for (var i=0; i<opts; i++){\n" +
-                                        "    if (ddl[0].options[i].value == \"240\"){\n" +
-                                        "        ddl[0].options[i].selected = true;\n" +
-                                        "        break;\n" +
-                                        "    }\n" +
+                                        "    ddl[0].options[i].value = 9000; \n" +
                                         "}\n" +
                                         "\n" +
                                         "var evt = document.createEvent(\"HTMLEvents\");\n" +
