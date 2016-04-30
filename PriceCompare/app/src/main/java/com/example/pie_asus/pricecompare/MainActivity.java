@@ -41,7 +41,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.util.List;
 
@@ -58,7 +57,6 @@ import java.util.List;
  */
 public class MainActivity extends AppCompatPreferenceActivity
 {
-
 
     /**
      * A preference value change listener that updates the preference's summary
@@ -124,6 +122,7 @@ public class MainActivity extends AppCompatPreferenceActivity
             return true;
         }
     };
+    int id = 0;
 
     /**
      * Helper method to determine if the device has an extra-large screen. For
@@ -229,6 +228,9 @@ public class MainActivity extends AppCompatPreferenceActivity
             // guidelines.
             bindPreferenceSummaryToValue(findPreference("example_text"));
 
+            final WebView webview = new WebView(this.getContext());
+            webview.getSettings().setJavaScriptEnabled(true);
+
             final Preference pref = findPreference("example_text");
             pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
             {
@@ -241,10 +243,28 @@ public class MainActivity extends AppCompatPreferenceActivity
                     preference.setSummary(newValue + "");
 
                     jbhifiRetrieveFeedTask jbhihiRFT = new jbhifiRetrieveFeedTask(preference, newValue + "");
-                    pbtechRetrieveFeedTask pbtechRFT = new pbtechRetrieveFeedTask(preference, newValue + "");
+                    pbtechRetrieveFeedTask pbtechRFT = new pbtechRetrieveFeedTask(preference, newValue + "", webview);
 
                     jbhihiRFT.execute();
                     pbtechRFT.execute();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                     return true;
                 }
 

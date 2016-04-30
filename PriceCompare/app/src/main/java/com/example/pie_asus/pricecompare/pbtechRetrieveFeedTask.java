@@ -66,16 +66,16 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
 
     private Preference preference;
 
+
     // http://stackoverflow.com/questions/10996479/how-to-update-a-textview-of-an-activity-from-another-classssss
     @SuppressLint("JavascriptInterface")
-    public pbtechRetrieveFeedTask(final Preference preference, String searchInput)
+    public pbtechRetrieveFeedTask(Preference preference, String searchInput, WebView webviewInput)
     {
         this.preference = preference;
         this.searchInput = searchInput.replaceAll("\\s+", "+");
 
+        final WebView webview = webviewInput;
 
-        final WebView webview = new WebView(preference.getContext());
-        webview.getSettings().setJavaScriptEnabled(true);
         webview.setWebViewClient(new WebViewClient()
         {
             @Override
@@ -151,12 +151,12 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
                                             String msg = reader.nextString();
                                             if (msg != null)
                                             {
-                                                Toast.makeText(preference.getContext(), msg, Toast.LENGTH_LONG).show();
+                                                Toast.makeText(webview.getContext(), msg, Toast.LENGTH_LONG).show();
                                                 File file = new File(Environment.getExternalStorageDirectory() + File.separator + "test.html");
                                                 file.createNewFile();
 
                                                 //write the bytes in file
-                                                if(file.exists())
+                                                if (file.exists())
                                                 {
                                                     OutputStream fo = new FileOutputStream(file);
                                                     fo.write(msg.getBytes());
@@ -186,7 +186,6 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
             }
         });
         webview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + "2tb" + "&p=search&o=price&d=a");
-        //webview.loadUrl("http://www.pbtech.co.nz/");
     }
 
     public pbtechRetrieveFeedTask()
@@ -217,10 +216,6 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
         {
             e.printStackTrace();
         }
-
-
-
-
         // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
         InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
 
