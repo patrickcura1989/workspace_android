@@ -17,3 +17,17 @@ http://stackoverflow.com/questions/6129384/programatically-populating-preference
 
 http://stackoverflow.com/questions/17255383/how-do-i-programmatically-add-edittextpreferences-to-my-preferencefragment
 
+var ddl = document.getElementsByClassName('rec_num');
+var opts = ddl[0].options.length;
+for (var i=0; i<opts; i++){
+    if (ddl[0].options[i].value == "240"){
+        ddl[0].options[i].selected = true;
+        break;
+    }
+}
+
+var evt = document.createEvent("HTMLEvents");
+evt.initEvent("change", false, true);
+ddl[0].dispatchEvent(evt);
+
+'<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';

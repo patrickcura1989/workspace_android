@@ -1,18 +1,25 @@
 package com.example.pie_asus.pricecompare;
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
+import android.os.Environment;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
+import android.util.JsonReader;
+import android.util.JsonToken;
 import android.util.Log;
+import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import org.ccil.cowan.tagsoup.jaxp.SAXParserImpl;
 import org.xml.sax.Attributes;
@@ -20,8 +27,12 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpCookie;
@@ -57,10 +68,125 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
 
     // http://stackoverflow.com/questions/10996479/how-to-update-a-textview-of-an-activity-from-another-classssss
     @SuppressLint("JavascriptInterface")
-    public pbtechRetrieveFeedTask(Preference preference, String searchInput)
+    public pbtechRetrieveFeedTask(final Preference preference, String searchInput)
     {
         this.preference = preference;
         this.searchInput = searchInput.replaceAll("\\s+", "+");
+
+
+        final WebView webview = new WebView(preference.getContext());
+        webview.getSettings().setJavaScriptEnabled(true);
+        webview.setWebViewClient(new WebViewClient()
+        {
+            @Override
+            public void onPageFinished(WebView view, String url)
+            {
+                Log.println(Log.ERROR, "log", "******" + url + "++++++++");
+                webview.evaluateJavascript("var ddl = document.getElementsByClassName('rec_num');\n" +
+                        "var opts = ddl[0].options.length;\n" +
+                        "for (var i=0; i<opts; i++){\n" +
+                        "    if (ddl[0].options[i].value == \"240\"){\n" +
+                        "        ddl[0].options[i].selected = true;\n" +
+                        "        break;\n" +
+                        "    }\n" +
+                        "}\n" +
+                        "\n" +
+                        "var evt = document.createEvent(\"HTMLEvents\");\n" +
+                        "evt.initEvent(\"change\", false, true);\n" +
+                        "ddl[0].dispatchEvent(evt);\n" +
+                        "\n", new ValueCallback<String>()
+                {
+                    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                    @Override
+                    public void onReceiveValue(String s)
+                    {
+                        JsonReader reader = new JsonReader(new StringReader(s));
+
+                        // Must set lenient to parse single values
+                        reader.setLenient(true);
+
+                        try
+                        {
+                            if (reader.peek() != JsonToken.NULL)
+                            {
+                                if (reader.peek() == JsonToken.STRING)
+                                {
+                                }
+                            }
+                        }
+                        catch (IOException e)
+                        {
+                            Log.e("TAG", "MainActivity: IOException", e);
+                        } finally
+                        {
+                            try
+                            {
+                                reader.close();
+                            }
+                            catch (IOException e)
+                            {
+                                // NOOP
+                            }
+                        }
+                    }
+                });
+                webview.evaluateJavascript(
+                        "'<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';", new ValueCallback<String>()
+                        {
+                            @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                            @Override
+                            public void onReceiveValue(String s)
+                            {
+                                JsonReader reader = new JsonReader(new StringReader(s));
+
+                                // Must set lenient to parse single values
+                                reader.setLenient(true);
+
+                                try
+                                {
+                                    if (reader.peek() != JsonToken.NULL)
+                                    {
+                                        if (reader.peek() == JsonToken.STRING)
+                                        {
+                                            String msg = reader.nextString();
+                                            if (msg != null)
+                                            {
+                                                Toast.makeText(preference.getContext(), msg, Toast.LENGTH_LONG).show();
+                                                File file = new File(Environment.getExternalStorageDirectory() + File.separator + "test.html");
+                                                file.createNewFile();
+
+                                                //write the bytes in file
+                                                if(file.exists())
+                                                {
+                                                    OutputStream fo = new FileOutputStream(file);
+                                                    fo.write(msg.getBytes());
+                                                    fo.close();
+                                                }
+
+                                            }
+                                        }
+                                    }
+                                }
+                                catch (IOException e)
+                                {
+                                    Log.e("TAG", "MainActivity: IOException", e);
+                                } finally
+                                {
+                                    try
+                                    {
+                                        reader.close();
+                                    }
+                                    catch (IOException e)
+                                    {
+                                        // NOOP
+                                    }
+                                }
+                            }
+                        });
+            }
+        });
+        webview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + "2tb" + "&p=search&o=price&d=a");
+        //webview.loadUrl("http://www.pbtech.co.nz/");
     }
 
     public pbtechRetrieveFeedTask()
@@ -91,6 +217,10 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
         {
             e.printStackTrace();
         }
+
+
+
+
         // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
         InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
 
