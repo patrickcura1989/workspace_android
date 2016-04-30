@@ -9,16 +9,17 @@ Log.println(Log.ERROR,"log","hello");
 package com.example.pie_asus.pricecompare;
 
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -27,9 +28,21 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
+import android.util.JsonReader;
+import android.util.JsonToken;
+import android.util.Log;
 import android.view.MenuItem;
+import android.webkit.ValueCallback;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.StringReader;
 import java.util.List;
 
 /**
@@ -144,11 +157,127 @@ public class MainActivity extends AppCompatPreferenceActivity
                         .getString(preference.getKey(), ""));
     }
 
+    @SuppressLint("JavascriptInterface")
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setupActionBar();
+        final WebView webview = new WebView(this);
+
+        webview.getSettings().setJavaScriptEnabled(true);
+
+        webview.setWebViewClient(new WebViewClient()
+        {
+            @Override
+            public void onPageFinished(WebView view, String url)
+            {
+                Log.println(Log.ERROR, "log", "******" + url + "++++++++");
+                webview.evaluateJavascript("var ddl = document.getElementsByClassName('rec_num');\n" +
+                        "var opts = ddl[0].options.length;\n" +
+                        "for (var i=0; i<opts; i++){\n" +
+                        "    if (ddl[0].options[i].value == \"240\"){\n" +
+                        "        ddl[0].options[i].selected = true;\n" +
+                        "        break;\n" +
+                        "    }\n" +
+                        "}\n" +
+                        "\n" +
+                        "var evt = document.createEvent(\"HTMLEvents\");\n" +
+                        "evt.initEvent(\"change\", false, true);\n" +
+                        "ddl[0].dispatchEvent(evt);\n" +
+                        "\n", new ValueCallback<String>()
+                {
+                    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                    @Override
+                    public void onReceiveValue(String s)
+                    {
+                        JsonReader reader = new JsonReader(new StringReader(s));
+
+                        // Must set lenient to parse single values
+                        reader.setLenient(true);
+
+                        try
+                        {
+                            if (reader.peek() != JsonToken.NULL)
+                            {
+                                if (reader.peek() == JsonToken.STRING)
+                                {
+                                }
+                            }
+                        }
+                        catch (IOException e)
+                        {
+                            Log.e("TAG", "MainActivity: IOException", e);
+                        } finally
+                        {
+                            try
+                            {
+                                reader.close();
+                            }
+                            catch (IOException e)
+                            {
+                                // NOOP
+                            }
+                        }
+                    }
+                });
+                webview.evaluateJavascript(
+                        "'<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';", new ValueCallback<String>()
+                {
+                    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                    @Override
+                    public void onReceiveValue(String s)
+                    {
+                        JsonReader reader = new JsonReader(new StringReader(s));
+
+                        // Must set lenient to parse single values
+                        reader.setLenient(true);
+
+                        try
+                        {
+                            if (reader.peek() != JsonToken.NULL)
+                            {
+                                if (reader.peek() == JsonToken.STRING)
+                                {
+                                    String msg = reader.nextString();
+                                    if (msg != null)
+                                    {
+                                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                                        File file = new File(Environment.getExternalStorageDirectory() + File.separator + "test.html");
+                                        file.createNewFile();
+
+                                        //write the bytes in file
+                                        if(file.exists())
+                                        {
+                                            OutputStream fo = new FileOutputStream(file);
+                                            fo.write(msg.getBytes());
+                                            fo.close();
+                                        }
+
+                                    }
+                                }
+                            }
+                        }
+                        catch (IOException e)
+                        {
+                            Log.e("TAG", "MainActivity: IOException", e);
+                        } finally
+                        {
+                            try
+                            {
+                                reader.close();
+                            }
+                            catch (IOException e)
+                            {
+                                // NOOP
+                            }
+                        }
+                    }
+                });
+            }
+        });
+        webview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + "2tb" + "&p=search&o=price&d=a");
+        //webview.loadUrl("http://www.pbtech.co.nz/");
     }
 
     /**
@@ -216,16 +345,18 @@ public class MainActivity extends AppCompatPreferenceActivity
             bindPreferenceSummaryToValue(findPreference("example_text"));
 
             final Preference pref = findPreference("example_text");
-            pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
 
                 @Override
                 public boolean onPreferenceChange(Preference preference,
-                                                  Object newValue) {
+                                                  Object newValue)
+                {
                     //Log.println(Log.ERROR,"log","hello");
-                    preference.setSummary(newValue+"");
+                    preference.setSummary(newValue + "");
 
-                    jbhifiRetrieveFeedTask jbhihiRFT = new jbhifiRetrieveFeedTask(preference, newValue+"");
-                    pbtechRetrieveFeedTask pbtechRFT = new pbtechRetrieveFeedTask(preference, newValue+"");
+                    jbhifiRetrieveFeedTask jbhihiRFT = new jbhifiRetrieveFeedTask(preference, newValue + "");
+                    pbtechRetrieveFeedTask pbtechRFT = new pbtechRetrieveFeedTask(preference, newValue + "");
 
                     jbhihiRFT.execute();
                     pbtechRFT.execute();

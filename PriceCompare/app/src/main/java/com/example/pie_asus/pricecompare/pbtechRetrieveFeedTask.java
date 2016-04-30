@@ -1,36 +1,32 @@
 package com.example.pie_asus.pricecompare;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 import org.ccil.cowan.tagsoup.jaxp.SAXParserImpl;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpCookie;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -40,9 +36,12 @@ import okhttp3.Response;
 
 /**
  * Created by PIE-ASUS on 24/03/2016.
+ * Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
  * http://stackoverflow.com/questions/17634643/how-to-add-a-hyperlink-into-a-preference-screen-preferenceactivity
  * http://developer.android.com/reference/android/os/AsyncTask.html
  * http://stackoverflow.com/questions/1239026/how-to-create-a-file-in-android
+ * http://stackoverflow.com/questions/19788294/how-does-evaluatejavascript-work
+ * http://stackoverflow.com/questions/8200945/how-to-get-html-content-from-a-webview#8201246
  */
 
 class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
@@ -57,39 +56,20 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
     private Preference preference;
 
     // http://stackoverflow.com/questions/10996479/how-to-update-a-textview-of-an-activity-from-another-classssss
+    @SuppressLint("JavascriptInterface")
     public pbtechRetrieveFeedTask(Preference preference, String searchInput)
     {
         this.preference = preference;
         this.searchInput = searchInput.replaceAll("\\s+", "+");
-
-        //        WebView webview = new WebView(this.preference.getContext());
-        //        webview.loadUrl("http://www.pbtech.co.nz/index.php?p=search&sf=" + this.searchInput + "&o=price&d=d");
     }
 
     public pbtechRetrieveFeedTask()
     {
+
     }
 
     String run(String url) throws IOException
     {
-        CookieManager cookieManager = new CookieManager();
-        CookieHandler.setDefault(cookieManager);
-        HttpCookie cookie = new HttpCookie("recordnumber", "240");
-        cookie.setDomain(".pbtech.co.nz");
-        cookie.setPath("/");
-        cookie.setVersion(0);
-        URI myuri = null;
-        try
-        {
-            myuri = new URI("http://www.pbtech.co.nz");
-            cookieManager.getCookieStore().add(myuri, cookie);
-        }
-        catch (URISyntaxException e)
-        {
-            e.printStackTrace();
-        }
-
-
         Request request = new Request.Builder()
                 .url(url)
                 .build();
@@ -105,7 +85,7 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
         String response = null;
         try
         {
-            response = example.run("http://www.pbtech.co.nz/index.php?p=search&sf=" + this.searchInput + "&o=price&d=d");
+            response = example.run("http://www.pbtech.co.nz/index.php?sf=" + this.searchInput + "&p=search&o=price&d=a");
         }
         catch (IOException e)
         {
@@ -255,6 +235,8 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
         }
 
     }
+
+
 
 
 }
