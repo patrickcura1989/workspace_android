@@ -62,7 +62,7 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
 
     private Context context;
 
-    private String searchResults = "", searchInput = "", searchResultsForParsing = "";
+    private String searchResults = "", searchInput = "", searchResultsForParsing = "", htmlCode="";
 
     private Preference preference;
 
@@ -149,6 +149,7 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
                                         if (reader.peek() == JsonToken.STRING)
                                         {
                                             String msg = reader.nextString();
+                                            htmlCode = msg;
                                             if (msg != null)
                                             {
                                                 Toast.makeText(webview.getContext(), msg, Toast.LENGTH_LONG).show();
@@ -217,7 +218,9 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
             e.printStackTrace();
         }
         // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
-        InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
+        //InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
+
+        InputStream stream = new ByteArrayInputStream(htmlCode.getBytes(Charset.forName("UTF-8")));
 
         try
         {
@@ -335,7 +338,7 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
             {
                 urlResultsArray.add(resultsArray[i]);
             }
-            if (i % 3 == 1)
+            else if (i % 3 == 1)
             {
                 nameResultsArray.add(resultsArray[i]);
             }
