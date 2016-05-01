@@ -1,3 +1,14 @@
+HARVEY NORMAN ISSUES
+-----
+
+http://www.harveynorman.co.nz/index.php?subcats=Y&status=A&pshort=N&pfull=N&pname=Y&pkeywords=Y&search_performed=Y&q=............&dispatch=products.search&items_per_page=9000&sort_by=price&sort_order=asc
+
+
+http://www.harveynorman.co.nz/index.php?subcats=Y&status=A&pshort=N&pfull=N&pname=Y&pkeywords=Y&search_performed=Y&q=++++++++++++++++++++++&dispatch=products.search&items_per_page=9000&sort_by=price&sort_order=asc
+
+------------
+
+
 http://developer.android.com/guide/topics/ui/settings.html#Intents
 
 http://www.tutorialsface.com/2015/10/android-fully-functional-ecommerce-app-sample-example-tutorial-from-scratch-part-1/

@@ -156,6 +156,7 @@ class harveyRetrieveFeedTask extends AsyncTask<Void, Void, String>
 
     protected void onPostExecute(String result)
     {
+        System.out.println(result);
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_harvey_search_results");
         preferenceCategory.removeAll();
