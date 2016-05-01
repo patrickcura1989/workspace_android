@@ -234,6 +234,8 @@ public class AscentMainActivity extends AppCompatPreferenceActivity
 
             final WebView ascentWebview = new WebView(this.getContext());
             ascentWebview.getSettings().setJavaScriptEnabled(true);
+            String ua = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
+            ascentWebview.getSettings().setUserAgentString(ua);
 
             final Preference pref = findPreference("example_text");
             pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()

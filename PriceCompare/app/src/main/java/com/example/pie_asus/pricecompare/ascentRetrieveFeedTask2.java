@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import org.ccil.cowan.tagsoup.jaxp.SAXParserImpl;
 import org.xml.sax.Attributes;
@@ -80,13 +81,12 @@ class ascentRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
                                 {
                                     isTD = true;
                                 }
-                            }
-                            else if (name.equalsIgnoreCase("td"))
-                            {
-                                if ("right".equals(a.getValue("align")) && "width:50px;".equals(a.getValue("style")))
+                                else if ("right".equals(a.getValue("align")) && "width:50px;".equals(a.getValue("style")))
                                 {
                                     isPrice = true;
                                 }
+                                //System.out.println(a.getValue("align")+"");
+                                //System.out.println(a.getValue("style")+"");
                             }
                             else if(name.equalsIgnoreCase("a"))
                             {
@@ -152,7 +152,8 @@ class ascentRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
 
     protected void onPostExecute(String result)
     {
-        System.out.println(result);
+        //Log.println(Log.ERROR,"log","******"+result+"++++++++");
+        //System.out.println(result);
         /* // For Testing Purposes
         File file = new File(Environment.getExternalStorageDirectory() + File.separator + "parse.txt");
         try
