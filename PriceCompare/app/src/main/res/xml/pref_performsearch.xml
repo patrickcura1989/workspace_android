@@ -40,4 +40,27 @@
         </PreferenceCategory>
     </PreferenceScreen>
 
+    <PreferenceScreen
+        android:key="pref_category_search_results_key"
+        android:title="@string/pref_noel_title"
+        android:persistent="false">
+
+        <PreferenceCategory
+            android:title="@string/pref_noel_search_results_title"
+            android:key="pref_key_noel_search_results">
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="pref_category_search_results_key"
+        android:title="@string/pref_harvey_title"
+        android:persistent="false">
+
+        <PreferenceCategory
+            android:title="@string/pref_harvey_search_results_title"
+            android:key="pref_key_harvey_search_results">
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+
 </PreferenceScreen>

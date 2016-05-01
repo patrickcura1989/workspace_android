@@ -243,10 +243,14 @@ public class MainActivity extends AppCompatPreferenceActivity
                     //Log.println(Log.ERROR,"log","hello");
                     preference.setSummary(newValue + "");
 
-                    jbhifiRetrieveFeedTask jbhihiRFT = new jbhifiRetrieveFeedTask(preference, newValue + "");
-                    jbhihiRFT.execute();
+                    jbhifiRetrieveFeedTask jbhifiRFT = new jbhifiRetrieveFeedTask(preference, newValue + "");
+                    jbhifiRFT.execute();
 
+                    noelRetrieveFeedTask noelRFT = new noelRetrieveFeedTask(preference, newValue + "");
+                    noelRFT.execute();
 
+                    harveyRetrieveFeedTask harveyRFT = new harveyRetrieveFeedTask(preference, newValue + "");
+                    harveyRFT.execute();
 
                     webview.setWebViewClient(new WebViewClient()
                     {
@@ -280,41 +284,7 @@ public class MainActivity extends AppCompatPreferenceActivity
                                         "var evt = document.createEvent(\"HTMLEvents\");\n" +
                                         "evt.initEvent(\"change\", false, true);\n" +
                                         "ddl[0].dispatchEvent(evt);\n" +
-                                        "\n", new ValueCallback<String>()
-                                {
-                                    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-                                    @Override
-                                    public void onReceiveValue(String s)
-                                    {
-                                        JsonReader reader = new JsonReader(new StringReader(s));
-
-                                        // Must set lenient to parse single values
-                                        reader.setLenient(true);
-
-                                        try
-                                        {
-                                            if (reader.peek() != JsonToken.NULL)
-                                            {
-                                                if (reader.peek() == JsonToken.STRING)
-                                                {
-                                                }
-                                            }
-                                        }
-                                        catch (IOException e)
-                                        {
-                                            Log.e("TAG", "MainActivity: IOException", e);
-                                        } finally
-                                        {
-                                            try
-                                            {
-                                                reader.close();
-                                            }
-                                            catch (IOException e)
-                                            {
-                                                // NOOP
-                                            }
-                                        }
-                                    }
+                                        "\n", new ValueCallback<String>(){@TargetApi(Build.VERSION_CODES.HONEYCOMB)@Override public void onReceiveValue(String s){}
                                 });
                                 webview.evaluateJavascript(
                                         "'<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';", new ValueCallback<String>()
@@ -339,7 +309,7 @@ public class MainActivity extends AppCompatPreferenceActivity
                                                             pbtechRFT.execute();
                                                             if (msg != null)
                                                             {
-
+                                                                /* // for testing purposes
                                                                 Toast.makeText(webview.getContext(), msg, Toast.LENGTH_LONG).show();
                                                                 File file = new File(Environment.getExternalStorageDirectory() + File.separator + "test.html");
                                                                 file.createNewFile();
@@ -350,7 +320,7 @@ public class MainActivity extends AppCompatPreferenceActivity
                                                                     fo.write(msg.getBytes());
                                                                     fo.close();
                                                                 }
-
+                                                                */
                                                             }
                                                         }
                                                     }
@@ -374,23 +344,8 @@ public class MainActivity extends AppCompatPreferenceActivity
                             }
                             counter++;                        }
                     });
-                    webview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + newValue + "&p=search&o=price&d=a");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+                    String searchInput = (newValue + "").replaceAll("\\s+", "+");
+                    webview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + searchInput + "&p=search&o=price&d=a");
 
                     return true;
                 }

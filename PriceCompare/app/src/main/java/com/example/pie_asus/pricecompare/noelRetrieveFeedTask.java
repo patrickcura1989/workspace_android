@@ -1,23 +1,12 @@
 package com.example.pie_asus.pricecompare;
 
-import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Environment;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
-import android.util.JsonReader;
-import android.util.JsonToken;
-import android.util.Log;
-import android.webkit.ValueCallback;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
-import android.widget.Toast;
 
 import org.ccil.cowan.tagsoup.jaxp.SAXParserImpl;
 import org.xml.sax.Attributes;
@@ -25,16 +14,14 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by PIE-ASUS on 24/03/2016.
@@ -46,7 +33,7 @@ import okhttp3.OkHttpClient;
  * http://stackoverflow.com/questions/8200945/how-to-get-html-content-from-a-webview#8201246
  */
 
-class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
+class noelRetrieveFeedTask extends AsyncTask<Void, Void, String>
 {
     private OkHttpClient client = new OkHttpClient();
     private Exception exception;
@@ -57,23 +44,47 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
 
     private Preference preference;
 
-
     ArrayList<String> nameResultsArray = new ArrayList<String>();
     ArrayList<String> priceResultsArray = new ArrayList<String>();
     ArrayList<String> urlResultsArray = new ArrayList<String>();
 
     // http://stackoverflow.com/questions/10996479/how-to-update-a-textview-of-an-activity-from-another-classssss
-    @SuppressLint("JavascriptInterface")
-    public pbtechRetrieveFeedTask2(Preference preference, String htmlCode)
+    public noelRetrieveFeedTask(Preference preference, String searchInput)
     {
         this.preference = preference;
-        this.htmlCode = htmlCode;
+        this.searchInput = searchInput.replaceAll("\\s+", "+");
+    }
+
+    public noelRetrieveFeedTask()
+    {
+    }
+
+    String run(String url) throws IOException
+    {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        Response response = client.newCall(request).execute();
+        return response.body().string();
     }
 
     @Override
     protected String doInBackground(Void... params)
     {
-        InputStream stream = new ByteArrayInputStream(htmlCode.getBytes(Charset.forName("UTF-8")));
+        noelRetrieveFeedTask example = new noelRetrieveFeedTask();
+        String response = null;
+        try
+        {
+            response = example.run("http://products.noelleeming.co.nz/search?p=Q&uid=573418519&ts=custom&w=" + this.searchInput + "&af=&method=and&view=list&isort=price");
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
+        InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
 
         try
         {
@@ -83,46 +94,30 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
                     {
                         private boolean isName = false;
                         private boolean isPrice = false;
-                        private boolean isPriceAll = false;
-                        private boolean isTD = false;
-                        private int priceCounter = 0;
-                        private String price = "", productNameFull = "", priceAllValue="";
+                        private String priceFull = "", productNameFull = "";
 
                         public void startElement(String uri, String localName, String name, Attributes a)
                         {
-                            if (name.equalsIgnoreCase("div"))
+                            if (name.equalsIgnoreCase("a"))
                             {
-                                if ("explistm_pname".equals(a.getValue("class")))
+                                if ("product-list__link".equals(a.getValue("class")))
                                 {
-                                    isName = true;
-                                    isTD = true;
+                                    searchResultsForParsing += a.getValue("title") + "\n";;
+                                    urlResultsArray.add( a.getValue("title"));
                                 }
                             }
-                            else if (name.equalsIgnoreCase("a"))
+                            else if (name.equalsIgnoreCase("h2"))
                             {
-                                if (isTD)
+                                if ("product-list__name".equals(a.getValue("class")))
                                 {
-                                    isTD = false;
-                                    searchResultsForParsing += a.getValue("href") + "\n";
-                                    //System.out.println(a.getValue("href"));
-                                    urlResultsArray.add( a.getValue("href"));
+                                    isName = true;
                                 }
                             }
                             else if (name.equalsIgnoreCase("span"))
                             {
-                                if ("explistm_dollars".equals(a.getValue("class")))
+                                if ("price-lockup__pricing-price".equals(a.getValue("class")))
                                 {
-                                    priceCounter++;
-                                    //System.out.println(priceCounter + " start");
                                     isPrice = true;
-                                    isPriceAll = false;
-                                }
-                            }
-                            else if (name.equalsIgnoreCase("td"))
-                            {
-                                if ("explistm_price".equals(a.getValue("class")))
-                                {
-                                    isPriceAll = true;
                                 }
                             }
                         }
@@ -137,17 +132,9 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
                             }
                             else if (isPrice)
                             {
-                                if (priceCounter >= 2)
-                                {
-                                    //System.out.println((new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " "));
-                                    price = price + (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ") + ".";
-                                }
-                            }
-                            else if (isPriceAll)
-                            {
-                                String priceAll = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
+                                String price = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
                                 //System.out.println(productName);
-                                priceAllValue+=priceAll;
+                                priceFull+=price;
                             }
                         }
 
@@ -162,26 +149,10 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
                             }
                             else if (isPrice)
                             {
-                                //System.out.println(priceCounter + " end");
                                 isPrice = false;
-                                if (priceCounter >= 2)
-                                {
-                                    price = price.substring(0, price.length() - 1);
-                                    searchResultsForParsing += price + "\n";
-                                    priceResultsArray.add(price);
-                                    priceCounter = 0;
-                                    price = "";
-                                }
-                            }
-                            else if (isPriceAll)
-                            {
-                                isPriceAll = false;
-                                if(priceAllValue.matches("(.*)vail(.*)"))
-                                {
-                                    searchResultsForParsing += priceAllValue + "\n";
-                                    priceResultsArray.add(priceAllValue);
-                                }
-                                priceAllValue = "";
+                                searchResultsForParsing += priceFull + "\n";
+                                priceResultsArray.add(priceFull);
+                                priceFull = "";
                             }
                         }
                     });
@@ -200,28 +171,8 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
 
     protected void onPostExecute(String result)
     {
-        //Log.println(Log.ERROR, "log", "******RESULT" + result + "++++++++");
-        //System.out.println(result);
-        /* // For Testing Purposes
-        File file = new File(Environment.getExternalStorageDirectory() + File.separator + "parse.txt");
-        try
-        {
-            file.createNewFile();
-            //write the bytes in file
-            if (file.exists())
-            {
-                OutputStream fo = new FileOutputStream(file);
-                fo.write(result.getBytes());
-                fo.close();
-            }
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        */
         PreferenceManager preferenceManager = preference.getPreferenceManager();
-        PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_pbtech_search_results");
+        PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_noel_search_results");
         preferenceCategory.removeAll();
 
         for (int i = 0; i < nameResultsArray.size(); i++)
@@ -235,12 +186,8 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
             redirect.setAction("android.intent.action.VIEW");
             resultPreference.setIntent(redirect);
             preferenceCategory.addPreference(resultPreference);
-            //Log.println(Log.ERROR,"log","******"+result+"++++++++");
         }
-
     }
-
-
 
 
 }
