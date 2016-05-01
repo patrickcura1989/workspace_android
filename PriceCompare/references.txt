@@ -49,5 +49,21 @@ var evt = document.createEvent("HTMLEvents");
 evt.initEvent("change", false, true);
 ddl[0].dispatchEvent(evt);
 
+
+
+var ddl1 = document.getElementById('Content_ProductList_ctl01_ddlSort');
+var opts1 = ddl1.options.length;
+for (var i = 0; i < opts1; i++) {
+    if (ddl1.options[i].value == "Price") {
+        ddl1.options[i].selected = true;
+        break;
+    }
+} 
+
+var evt1 = document.createEvent("HTMLEvents");
+evt1.initEvent("change", false, true);
+ddl1.dispatchEvent(evt1);
+
+
 '<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';
 

@@ -21,7 +21,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -57,7 +56,7 @@ import java.util.List;
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
  */
-public class MainActivity extends AppCompatPreferenceActivity
+public class AscentMainActivity extends AppCompatPreferenceActivity
 {
 
     /**
@@ -233,6 +232,8 @@ public class MainActivity extends AppCompatPreferenceActivity
             final WebView pbtechWebview = new WebView(this.getContext());
             pbtechWebview.getSettings().setJavaScriptEnabled(true);
 
+            final WebView ascentWebview = new WebView(this.getContext());
+            ascentWebview.getSettings().setJavaScriptEnabled(true);
 
             final Preference pref = findPreference("example_text");
             pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
@@ -262,9 +263,6 @@ public class MainActivity extends AppCompatPreferenceActivity
 
                     tmRetrieveFeedTask tmRFT = new tmRetrieveFeedTask(preference, newValue + "");
                     tmRFT.execute();
-
-                    ascentRetrieveFeedTask ascentRFT = new ascentRetrieveFeedTask(preference, newValue + "");
-                    ascentRFT.execute();
 
                     pbtechWebview.setWebViewClient(new WebViewClient()
                     {
@@ -361,6 +359,93 @@ public class MainActivity extends AppCompatPreferenceActivity
                     String searchInput = (newValue + "").replaceAll("\\s+", "+");
                     pbtechWebview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + searchInput + "&p=search&o=price&d=a");
 
+                    ascentWebview.setWebViewClient(new WebViewClient()
+                    {
+                        int counter = 0;
+                        @Override
+                        public void onPageFinished(WebView view, String url)
+                        {
+                            if (counter < 1)
+                            {
+                                Log.println(Log.ERROR, "log", "******" + url + "++++++++");
+                                ascentWebview.evaluateJavascript(
+                                        "var ddl1 = document.getElementById('Content_ProductList_ctl01_ddlSort');\n" +
+                                                "var opts1 = ddl1.options.length;\n" +
+                                                "for (var i = 0; i < opts1; i++) {\n" +
+                                                "    if (ddl1.options[i].value == \"Price\") {\n" +
+                                                "        ddl1.options[i].selected = true;\n" +
+                                                "        break;\n" +
+                                                "    }\n" +
+                                                "} \n" +
+                                                "\n" +
+                                                "var evt1 = document.createEvent(\"HTMLEvents\");\n" +
+                                                "evt1.initEvent(\"change\", false, true);\n" +
+                                                "ddl1.dispatchEvent(evt1);" +
+                                                "\n", new ValueCallback<String>(){@TargetApi(Build.VERSION_CODES.HONEYCOMB)@Override public void onReceiveValue(String s){}
+                                        });
+                                ascentWebview.evaluateJavascript(
+                                        "location.reload();", new ValueCallback<String>(){@TargetApi(Build.VERSION_CODES.HONEYCOMB)@Override public void onReceiveValue(String s){}
+                                        });
+                                ascentWebview.evaluateJavascript(
+                                        " $( 'body' ).html();", new ValueCallback<String>()
+                                        {
+                                            @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                                            @Override
+                                            public void onReceiveValue(String s)
+                                            {
+                                                JsonReader reader = new JsonReader(new StringReader(s));
+
+                                                // Must set lenient to parse single values
+                                                reader.setLenient(true);
+
+                                                try
+                                                {
+                                                    if (reader.peek() != JsonToken.NULL)
+                                                    {
+                                                        if (reader.peek() == JsonToken.STRING)
+                                                        {
+                                                            String msg = reader.nextString();
+                                                            ascentRetrieveFeedTask2 ascentRFT = new ascentRetrieveFeedTask2(pref, msg);
+                                                            ascentRFT.execute();
+                                                            if (msg != null)
+                                                            {
+                                                                // for testing purposes
+                                                                Toast.makeText(ascentWebview.getContext(), msg, Toast.LENGTH_LONG).show();
+                                                                File file = new File(Environment.getExternalStorageDirectory() + File.separator + "test.html");
+                                                                file.createNewFile();
+                                                                //write the bytes in file
+                                                                if (file.exists())
+                                                                {
+                                                                    OutputStream fo = new FileOutputStream(file);
+                                                                    fo.write(msg.getBytes());
+                                                                    fo.close();
+                                                                }
+
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                catch (IOException e)
+                                                {
+                                                    Log.e("TAG", "MainActivity: IOException", e);
+                                                } finally
+                                                {
+                                                    try
+                                                    {
+                                                        reader.close();
+                                                    }
+                                                    catch (IOException e)
+                                                    {
+                                                        // NOOP
+                                                    }
+                                                }
+                                            }
+                                        });
+                            }
+                            counter++;                        }
+                    });
+
+                    ascentWebview.loadUrl("http://www.ascent.co.nz/search.aspx?T1=" + searchInput );
 
                     return true;
                 }
@@ -375,7 +460,7 @@ public class MainActivity extends AppCompatPreferenceActivity
 
             if (id == android.R.id.home)
             {
-                startActivity(new Intent(getActivity(), MainActivity.class));
+                startActivity(new Intent(getActivity(), AscentMainActivity.class));
                 return true;
             }
             return super.onOptionsItemSelected(item);
@@ -411,7 +496,7 @@ public class MainActivity extends AppCompatPreferenceActivity
             int id = item.getItemId();
             if (id == android.R.id.home)
             {
-                startActivity(new Intent(getActivity(), MainActivity.class));
+                startActivity(new Intent(getActivity(), AscentMainActivity.class));
                 return true;
             }
             return super.onOptionsItemSelected(item);
@@ -445,7 +530,7 @@ public class MainActivity extends AppCompatPreferenceActivity
             int id = item.getItemId();
             if (id == android.R.id.home)
             {
-                startActivity(new Intent(getActivity(), MainActivity.class));
+                startActivity(new Intent(getActivity(), AscentMainActivity.class));
                 return true;
             }
             return super.onOptionsItemSelected(item);

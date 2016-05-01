@@ -42,6 +42,17 @@
 
     <PreferenceScreen
         android:key="pref_category_search_results_key"
+        android:title="@string/pref_ascent_title"
+        android:persistent="false">
+
+        <PreferenceCategory
+            android:title="@string/pref_ascent_search_results_title"
+            android:key="pref_key_ascent_search_results">
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="pref_category_search_results_key"
         android:title="@string/pref_noel_title"
         android:persistent="false">
 

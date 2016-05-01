@@ -67,6 +67,9 @@
     <string name="pref_pbtech_search_results_title">PB Tech Search Results</string>
     <string name="pref_pbtech_title">PB Tech</string>
 
+    <string name="pref_ascent_search_results_title">Ascent Search Results</string>
+    <string name="pref_ascent_title">Ascent</string>
+
     <string name="pref_noel_search_results_title">Noel Leeming Search Results</string>
     <string name="pref_noel_title">Noel Leeming</string>
 
