@@ -78,4 +78,7 @@
 
     <string name="pref_wh_search_results_title">Warehouse Search Results</string>
     <string name="pref_wh_title">Warehouse</string>
+
+    <string name="pref_tm_search_results_title">TradeMe Search Results</string>
+    <string name="pref_tm_title">TradeMe</string>
 </resources>

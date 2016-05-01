@@ -258,6 +258,9 @@ public class MainActivity extends AppCompatPreferenceActivity
                     whRetrieveFeedTask whRFT = new whRetrieveFeedTask(preference, newValue + "");
                     whRFT.execute();
 
+                    tmRetrieveFeedTask tmRFT = new tmRetrieveFeedTask(preference, newValue + "");
+                    tmRFT.execute();
+
                     webview.setWebViewClient(new WebViewClient()
                     {
                         int counter = 0;
