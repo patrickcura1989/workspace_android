@@ -252,6 +252,12 @@ public class MainActivity extends AppCompatPreferenceActivity
                     harveyRetrieveFeedTask harveyRFT = new harveyRetrieveFeedTask(preference, newValue + "");
                     harveyRFT.execute();
 
+                    stationeryRetrieveFeedTask stationeryRFT = new stationeryRetrieveFeedTask(preference, newValue + "");
+                    stationeryRFT.execute();
+
+                    whRetrieveFeedTask whRFT = new whRetrieveFeedTask(preference, newValue + "");
+                    whRFT.execute();
+
                     webview.setWebViewClient(new WebViewClient()
                     {
                         int counter = 0;

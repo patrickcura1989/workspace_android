@@ -62,5 +62,26 @@
         </PreferenceCategory>
     </PreferenceScreen>
 
+    <PreferenceScreen
+        android:key="pref_category_search_results_key"
+        android:title="@string/pref_stationery_title"
+        android:persistent="false">
+
+        <PreferenceCategory
+            android:title="@string/pref_stationery_search_results_title"
+            android:key="pref_key_stationery_search_results">
+        </PreferenceCategory>
+    </PreferenceScreen>
+
+    <PreferenceScreen
+        android:key="pref_category_search_results_key"
+        android:title="@string/pref_wh_title"
+        android:persistent="false">
+
+        <PreferenceCategory
+            android:title="@string/pref_wh_search_results_title"
+            android:key="pref_key_wh_search_results">
+        </PreferenceCategory>
+    </PreferenceScreen>
 
 </PreferenceScreen>

@@ -72,4 +72,10 @@
 
     <string name="pref_harvey_search_results_title">Harvey Norman Search Results</string>
     <string name="pref_harvey_title">Harvey Norman</string>
+
+    <string name="pref_stationery_search_results_title">Warehouse Stationery Search Results</string>
+    <string name="pref_stationery_title">Warehouse Stationery</string>
+
+    <string name="pref_wh_search_results_title">Warehouse Search Results</string>
+    <string name="pref_wh_title">Warehouse</string>
 </resources>
