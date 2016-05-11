@@ -82,81 +82,87 @@ class harveyRetrieveFeedTask extends AsyncTask<Void, Void, String>
         {
             e.printStackTrace();
         }
-
-        // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
-        InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
-
-        try
+        if (null != response) // used for no internet connection, no response is received if there is no internet connection
         {
-            SAXParserImpl.newInstance(null).parse(stream,
-                    // http://stackoverflow.com/questions/24113529/how-to-get-elements-value-from-xml-using-sax-parser-in-startelement
-                    new DefaultHandler()
-                    {
-                        private boolean isName = false;
-                        private boolean isPrice = false;
-                        private String priceFull = "", productNameFull = "";
+            // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
+            InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
 
-                        public void startElement(String uri, String localName, String name, Attributes a)
+            try
+            {
+                SAXParserImpl.newInstance(null).parse(stream,
+                        // http://stackoverflow.com/questions/24113529/how-to-get-elements-value-from-xml-using-sax-parser-in-startelement
+                        new DefaultHandler()
                         {
-                            if (name.equalsIgnoreCase("a"))
-                            {
-                                if ("product-title fn".equals(a.getValue("class")))
-                                {
-                                    searchResultsForParsing += a.getValue("href") + "\n";;
-                                    urlResultsArray.add( a.getValue("href"));
+                            private boolean isName = false;
+                            private boolean isPrice = false;
+                            private String priceFull = "", productNameFull = "";
 
-                                    searchResultsForParsing += a.getValue("title") + "\n";
-                                    nameResultsArray.add(a.getValue("title"));
+                            public void startElement(String uri, String localName, String name, Attributes a)
+                            {
+                                if (name.equalsIgnoreCase("a"))
+                                {
+                                    if ("product-title fn".equals(a.getValue("class")))
+                                    {
+                                        if(!"Harvey Norman PhotoCentre".equals(a.getValue("title")))
+                                        { // for exceptions received after inputting garbage inputs
+
+                                            searchResultsForParsing += a.getValue("href") + "\n";
+                                            urlResultsArray.add(a.getValue("href"));
+
+                                            searchResultsForParsing += a.getValue("title") + "\n";
+                                            nameResultsArray.add(a.getValue("title"));
+                                        }
+                                    }
+                                }
+                                else if (name.equalsIgnoreCase("span"))
+                                {
+                                    String spanClass = a.getValue("id");
+
+                                    if (spanClass != null && spanClass.matches("(.*)sec_discounted_price(.*)"))
+                                    {
+                                        isPrice = true;
+                                    }
                                 }
                             }
-                            else if (name.equalsIgnoreCase("span"))
-                            {
-                                String spanClass = a.getValue("id");
 
-                                if (spanClass != null && spanClass.matches("(.*)sec_discounted_price(.*)"))
+                            public void characters(char[] ch, int start, int length)
+                            {
+                                if (isPrice)
                                 {
-                                    isPrice = true;
+                                    String price = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
+                                    //System.out.println(productName);
+                                    priceFull += price;
                                 }
                             }
-                        }
 
-                        public void characters(char[] ch, int start, int length)
-                        {
-                            if (isPrice)
+                            public void endElement(String uri, String localName, String qName)
                             {
-                                String price = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
-                                //System.out.println(productName);
-                                priceFull+=price;
-                            }
-                        }
+                                if (isPrice)
+                                {
+                                    isPrice = false;
+                                    searchResultsForParsing += priceFull + "\n";
 
-                        public void endElement(String uri, String localName, String qName)
-                        {
-                            if (isPrice)
-                            {
-                                isPrice = false;
-                                searchResultsForParsing += priceFull + "\n";
-                                priceResultsArray.add(priceFull);
-                                priceFull = "";
+                                    priceResultsArray.add(priceFull);
+                                    priceFull = "";
+                                }
                             }
-                        }
-                    });
+                        });
+            }
+            catch (SAXException e)
+            {
+                e.printStackTrace();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
-        catch (SAXException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
         return searchResultsForParsing;
     }
 
     protected void onPostExecute(String result)
     {
-        System.out.println(result);
+        //System.out.println(result);
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_harvey_search_results");
         preferenceCategory.removeAll();
@@ -166,7 +172,7 @@ class harveyRetrieveFeedTask extends AsyncTask<Void, Void, String>
             Preference resultPreference = new Preference(preference.getContext());
             resultPreference.setKey("pref_name");
             resultPreference.setTitle(nameResultsArray.get(i));
-            resultPreference.setSummary(priceResultsArray.get(i));
+            resultPreference.setSummary("$"+priceResultsArray.get(i));
             Intent redirect = new Intent();
             redirect.setData(Uri.parse(urlResultsArray.get(i)));
             redirect.setAction("android.intent.action.VIEW");

@@ -82,73 +82,75 @@ class stationeryRetrieveFeedTask extends AsyncTask<Void, Void, String>
         {
             e.printStackTrace();
         }
-
-        // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
-        InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
-
-        try
+        if (null != response) // used for no internet connection, no response is received if there is no internet connection
         {
-            SAXParserImpl.newInstance(null).parse(stream,
-                    // http://stackoverflow.com/questions/24113529/how-to-get-elements-value-from-xml-using-sax-parser-in-startelement
-                    new DefaultHandler()
-                    {
-                        private boolean isName = false;
-                        private boolean isPrice = false;
-                        private String priceFull = "", productNameFull = "";
+            // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
+            InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
 
-                        public void startElement(String uri, String localName, String name, Attributes a)
+            try
+            {
+                SAXParserImpl.newInstance(null).parse(stream,
+                        // http://stackoverflow.com/questions/24113529/how-to-get-elements-value-from-xml-using-sax-parser-in-startelement
+                        new DefaultHandler()
                         {
-                            if (name.equalsIgnoreCase("a"))
-                            {
-                                if ("name-link gtm-product-click".equals(a.getValue("class")))
-                                {
-                                    searchResultsForParsing += a.getValue("href") + "\n";;
-                                    urlResultsArray.add( a.getValue("href"));
+                            private boolean isName = false;
+                            private boolean isPrice = false;
+                            private String priceFull = "", productNameFull = "";
 
-                                    searchResultsForParsing += a.getValue("title") + "\n";
-                                    nameResultsArray.add(a.getValue("title"));
+                            public void startElement(String uri, String localName, String name, Attributes a)
+                            {
+                                if (name.equalsIgnoreCase("a"))
+                                {
+                                    if ("name-link gtm-product-click".equals(a.getValue("class")))
+                                    {
+                                        searchResultsForParsing += a.getValue("href") + "\n";
+                                        ;
+                                        urlResultsArray.add(a.getValue("href"));
+
+                                        searchResultsForParsing += a.getValue("title") + "\n";
+                                        nameResultsArray.add(a.getValue("title"));
+                                    }
+                                }
+                                else if (name.equalsIgnoreCase("span"))
+                                {
+                                    if ("price-sales".equals(a.getValue("class")))
+                                    {
+                                        isPrice = true;
+                                    }
                                 }
                             }
-                            else if (name.equalsIgnoreCase("span"))
+
+                            public void characters(char[] ch, int start, int length)
                             {
-                                if ("price-sales".equals(a.getValue("class")))
+                                if (isPrice)
                                 {
-                                    isPrice = true;
+                                    String price = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
+                                    //System.out.println(productName);
+                                    priceFull += price;
                                 }
                             }
-                        }
 
-                        public void characters(char[] ch, int start, int length)
-                        {
-                            if (isPrice)
+                            public void endElement(String uri, String localName, String qName)
                             {
-                                String price = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
-                                //System.out.println(productName);
-                                priceFull+=price;
+                                if (isPrice)
+                                {
+                                    isPrice = false;
+                                    searchResultsForParsing += priceFull + "\n";
+                                    priceResultsArray.add(priceFull);
+                                    priceFull = "";
+                                }
                             }
-                        }
-
-                        public void endElement(String uri, String localName, String qName)
-                        {
-                            if (isPrice)
-                            {
-                                isPrice = false;
-                                searchResultsForParsing += priceFull + "\n";
-                                priceResultsArray.add(priceFull);
-                                priceFull = "";
-                            }
-                        }
-                    });
+                        });
+            }
+            catch (SAXException e)
+            {
+                e.printStackTrace();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
-        catch (SAXException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
         return searchResultsForParsing;
     }
 

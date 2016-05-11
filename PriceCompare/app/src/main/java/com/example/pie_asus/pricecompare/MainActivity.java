@@ -6,6 +6,7 @@ http://stackoverflow.com/questions/25544609/javascript-change-dropdown-list-valu
 http://stackoverflow.com/questions/8309796/want-to-load-desktop-version-in-my-webview-using-uastring#8310480
 http://stackoverflow.com/questions/15874117/how-to-set-delay-in-android
 Log.println(Log.ERROR,"log","hello");
+http://stackoverflow.com/questions/9521232/how-to-catch-an-exception-if-the-internet-or-signal-is-down
  */
 
 package com.example.pie_asus.pricecompare;
@@ -18,12 +19,12 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
@@ -37,16 +38,12 @@ import android.util.JsonToken;
 import android.util.Log;
 import android.view.MenuItem;
 import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.List;
 
@@ -221,6 +218,17 @@ public class MainActivity extends AppCompatPreferenceActivity
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public static class PerformSearchPreferenceFragment extends PreferenceFragment
     {
+        public boolean isOnline()
+        {
+            ConnectivityManager cm = (ConnectivityManager) this.getContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            if (netInfo != null && netInfo.isConnectedOrConnecting())
+            {
+                return true;
+            }
+            return false;
+        }
+
         @Override
         public void onCreate(Bundle savedInstanceState)
         {
@@ -256,81 +264,91 @@ public class MainActivity extends AppCompatPreferenceActivity
                     //Log.println(Log.ERROR,"log","hello");
                     preference.setSummary(newValue + "");
 
-                    jbhifiRetrieveFeedTask jbhifiRFT = new jbhifiRetrieveFeedTask(preference, newValue + "");
-                    jbhifiRFT.execute();
-
-                    noelRetrieveFeedTask noelRFT = new noelRetrieveFeedTask(preference, newValue + "");
-                    noelRFT.execute();
-
-                    harveyRetrieveFeedTask harveyRFT = new harveyRetrieveFeedTask(preference, newValue + "");
-                    harveyRFT.execute();
-
-                    stationeryRetrieveFeedTask stationeryRFT = new stationeryRetrieveFeedTask(preference, newValue + "");
-                    stationeryRFT.execute();
-
-                    whRetrieveFeedTask whRFT = new whRetrieveFeedTask(preference, newValue + "");
-                    whRFT.execute();
-
-                    tmRetrieveFeedTask tmRFT = new tmRetrieveFeedTask(preference, newValue + "");
-                    tmRFT.execute();
-
-                    pbtechWebview.setWebViewClient(new WebViewClient()
+                    if (isOnline())
                     {
-                        int counter = 0;
-                        @Override
-                        public void onPageFinished(WebView view, String url)
+
+                        jbhifiRetrieveFeedTask jbhifiRFT = new jbhifiRetrieveFeedTask(preference, newValue + "");
+                        jbhifiRFT.execute();
+
+                        noelRetrieveFeedTask noelRFT = new noelRetrieveFeedTask(preference, newValue + "");
+                        noelRFT.execute();
+
+                        harveyRetrieveFeedTask harveyRFT = new harveyRetrieveFeedTask(preference, newValue + "");
+                        harveyRFT.execute();
+
+                        stationeryRetrieveFeedTask stationeryRFT = new stationeryRetrieveFeedTask(preference, newValue + "");
+                        stationeryRFT.execute();
+
+                        whRetrieveFeedTask whRFT = new whRetrieveFeedTask(preference, newValue + "");
+                        whRFT.execute();
+
+                        tmRetrieveFeedTask tmRFT = new tmRetrieveFeedTask(preference, newValue + "");
+                        tmRFT.execute();
+
+                        pbtechWebview.setWebViewClient(new WebViewClient()
                         {
-                            if (counter < 1)
+                            int counter = 0;
+
+                            @Override
+                            public void onPageFinished(WebView view, String url)
                             {
-                                //Log.println(Log.ERROR, "log", "******" + url + "++++++++");
-                                pbtechWebview.evaluateJavascript(
-                                        "var ddl1 = document.getElementById('cate_sort_by');\n" +
-                                                "var opts1 = ddl1.options.length;\n" +
-                                                "for (var i = 0; i < opts1; i++) {\n" +
-                                                "    if (ddl1.options[i].value == \"price|a\") {\n" +
-                                                "        ddl1.options[i].selected = true;\n" +
-                                                "        break;\n" +
-                                                "    }\n" +
-                                                "} \n" +
-                                                "\n" +
-                                                "var evt1 = document.createEvent(\"HTMLEvents\");\n" +
-                                                "evt1.initEvent(\"change\", false, true);\n" +
-                                                "ddl1.dispatchEvent(evt1);\n" +
-                                                "\n" +
-                                                "var ddl = document.getElementsByClassName('rec_num');\n" +
-                                                "var opts = ddl[0].options.length;\n" +
-                                                "for (var i=0; i<opts; i++){\n" +
-                                                "    ddl[0].options[i].value = 9000; \n" +
-                                                "}\n" +
-                                                "\n" +
-                                                "var evt = document.createEvent(\"HTMLEvents\");\n" +
-                                                "evt.initEvent(\"change\", false, true);\n" +
-                                                "ddl[0].dispatchEvent(evt);\n" +
-                                                "\n", new ValueCallback<String>(){@TargetApi(Build.VERSION_CODES.HONEYCOMB)@Override public void onReceiveValue(String s){}
-                                        });
-                                pbtechWebview.evaluateJavascript(
-                                        "'<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';", new ValueCallback<String>()
-                                        {
-                                            @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-                                            @Override
-                                            public void onReceiveValue(String s)
+                                if (counter < 1)
+                                {
+                                    //Log.println(Log.ERROR, "log", "******" + url + "++++++++");
+                                    pbtechWebview.evaluateJavascript(
+                                            "var ddl1 = document.getElementById('cate_sort_by');\n" +
+                                                    "var opts1 = ddl1.options.length;\n" +
+                                                    "for (var i = 0; i < opts1; i++) {\n" +
+                                                    "    if (ddl1.options[i].value == \"price|a\") {\n" +
+                                                    "        ddl1.options[i].selected = true;\n" +
+                                                    "        break;\n" +
+                                                    "    }\n" +
+                                                    "} \n" +
+                                                    "\n" +
+                                                    "var evt1 = document.createEvent(\"HTMLEvents\");\n" +
+                                                    "evt1.initEvent(\"change\", false, true);\n" +
+                                                    "ddl1.dispatchEvent(evt1);\n" +
+                                                    "\n" +
+                                                    "var ddl = document.getElementsByClassName('rec_num');\n" +
+                                                    "var opts = ddl[0].options.length;\n" +
+                                                    "for (var i=0; i<opts; i++){\n" +
+                                                    "    ddl[0].options[i].value = 9000; \n" +
+                                                    "}\n" +
+                                                    "\n" +
+                                                    "var evt = document.createEvent(\"HTMLEvents\");\n" +
+                                                    "evt.initEvent(\"change\", false, true);\n" +
+                                                    "ddl[0].dispatchEvent(evt);\n" +
+                                                    "\n", new ValueCallback<String>()
                                             {
-                                                JsonReader reader = new JsonReader(new StringReader(s));
-
-                                                // Must set lenient to parse single values
-                                                reader.setLenient(true);
-
-                                                try
+                                                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                                                @Override
+                                                public void onReceiveValue(String s)
                                                 {
-                                                    if (reader.peek() != JsonToken.NULL)
+                                                }
+                                            });
+                                    pbtechWebview.evaluateJavascript(
+                                            "'<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>';", new ValueCallback<String>()
+                                            {
+                                                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                                                @Override
+                                                public void onReceiveValue(String s)
+                                                {
+                                                    JsonReader reader = new JsonReader(new StringReader(s));
+
+                                                    // Must set lenient to parse single values
+                                                    reader.setLenient(true);
+
+                                                    try
                                                     {
-                                                        if (reader.peek() == JsonToken.STRING)
+                                                        if (reader.peek() != JsonToken.NULL)
                                                         {
-                                                            String msg = reader.nextString();
-                                                            pbtechRetrieveFeedTask2 pbtechRFT = new pbtechRetrieveFeedTask2(pref, msg);
-                                                            pbtechRFT.execute();
-                                                            if (msg != null)
+                                                            if (reader.peek() == JsonToken.STRING)
                                                             {
+                                                                String msg = reader.nextString();
+                                                                pbtechRetrieveFeedTask2 pbtechRFT = new pbtechRetrieveFeedTask2(pref, msg);
+                                                                pbtechRFT.execute();
+                                                                if (msg != null)
+                                                                {
                                                                 /* // for testing purposes
                                                                 Toast.makeText(webview.getContext(), msg, Toast.LENGTH_LONG).show();
                                                                 File file = new File(Environment.getExternalStorageDirectory() + File.separator + "test.html");
@@ -343,84 +361,96 @@ public class MainActivity extends AppCompatPreferenceActivity
                                                                     fo.close();
                                                                 }
                                                                 */
+                                                                }
                                                             }
                                                         }
                                                     }
-                                                }
-                                                catch (IOException e)
-                                                {
-                                                    Log.e("TAG", "MainActivity: IOException", e);
-                                                } finally
-                                                {
-                                                    try
-                                                    {
-                                                        reader.close();
-                                                    }
                                                     catch (IOException e)
                                                     {
-                                                        // NOOP
-                                                    }
-                                                }
-                                            }
-                                        });
-                            }
-                            counter++;                        }
-                    });
-                    String searchInput = (newValue + "").replaceAll("\\s+", "+");
-                    pbtechWebview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + searchInput + "&p=search&o=price&d=a");
-
-                    ascentWebview.setWebViewClient(new WebViewClient()
-                    {
-                        int counter = 0;
-                        @Override
-                        public void onPageFinished(WebView view, String url)
-                        {
-                            if (counter < 1)
-                            {
-                                //Log.println(Log.ERROR, "log", "******" + url + "++++++++");
-                                ascentWebview.evaluateJavascript(
-                                        "var ddl1 = document.getElementById('Content_ProductList_ctl01_ddlSort');\n" +
-                                                "var opts1 = ddl1.options.length;\n" +
-                                                "for (var i = 0; i < opts1; i++) {\n" +
-                                                "    if (ddl1.options[i].value == \"Price\") {\n" +
-                                                "        ddl1.options[i].selected = true;\n" +
-                                                "        break;\n" +
-                                                "    }\n" +
-                                                "} \n" +
-                                                "\n" +
-                                                "var evt1 = document.createEvent(\"HTMLEvents\");\n" +
-                                                "evt1.initEvent(\"change\", false, true);\n" +
-                                                "ddl1.dispatchEvent(evt1);" +
-                                                "\n", new ValueCallback<String>(){@TargetApi(Build.VERSION_CODES.HONEYCOMB)@Override public void onReceiveValue(String s){}
-                                        });
-                                final Handler handler = new Handler();
-                                handler.postDelayed(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        // Do something after 5s = 5000ms
-                                        ascentWebview.evaluateJavascript(
-                                                " $( 'body' ).html();", new ValueCallback<String>()
-                                                {
-                                                    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-                                                    @Override
-                                                    public void onReceiveValue(String s)
+                                                        Log.e("TAG", "MainActivity: IOException", e);
+                                                    } finally
                                                     {
-                                                        JsonReader reader = new JsonReader(new StringReader(s));
-
-                                                        // Must set lenient to parse single values
-                                                        reader.setLenient(true);
-
                                                         try
                                                         {
-                                                            if (reader.peek() != JsonToken.NULL)
+                                                            reader.close();
+                                                        }
+                                                        catch (IOException e)
+                                                        {
+                                                            // NOOP
+                                                        }
+                                                    }
+                                                }
+                                            });
+                                }
+                                counter++;
+                            }
+                        });
+                        String searchInput = (newValue + "").replaceAll("\\s+", "+");
+                        String pbtechSearchInput = (newValue + "").replaceAll("\\s+", "+")+"+%2B"; // workaround to pbtech issues with searches like: apple, iphone, macbook
+
+                        pbtechWebview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + pbtechSearchInput + "&p=search&o=price&d=a");
+
+                        ascentWebview.setWebViewClient(new WebViewClient()
+                        {
+                            int counter = 0;
+
+                            @Override
+                            public void onPageFinished(WebView view, String url)
+                            {
+                                if (counter < 1)
+                                {
+                                    //Log.println(Log.ERROR, "log", "******" + url + "++++++++");
+                                    ascentWebview.evaluateJavascript(
+                                            "var ddl1 = document.getElementById('Content_ProductList_ctl01_ddlSort');\n" +
+                                                    "var opts1 = ddl1.options.length;\n" +
+                                                    "for (var i = 0; i < opts1; i++) {\n" +
+                                                    "    if (ddl1.options[i].value == \"Price\") {\n" +
+                                                    "        ddl1.options[i].selected = true;\n" +
+                                                    "        break;\n" +
+                                                    "    }\n" +
+                                                    "} \n" +
+                                                    "\n" +
+                                                    "var evt1 = document.createEvent(\"HTMLEvents\");\n" +
+                                                    "evt1.initEvent(\"change\", false, true);\n" +
+                                                    "ddl1.dispatchEvent(evt1);" +
+                                                    "\n", new ValueCallback<String>()
+                                            {
+                                                @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                                                @Override
+                                                public void onReceiveValue(String s)
+                                                {
+                                                }
+                                            });
+                                    final Handler handler = new Handler();
+                                    handler.postDelayed(new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            // Do something after 5s = 5000ms
+                                            ascentWebview.evaluateJavascript(
+                                                    " $( 'body' ).html();", new ValueCallback<String>()
+                                                    {
+                                                        @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+                                                        @Override
+                                                        public void onReceiveValue(String s)
+                                                        {
+                                                            JsonReader reader = new JsonReader(new StringReader(s));
+
+                                                            // Must set lenient to parse single values
+                                                            reader.setLenient(true);
+
+                                                            try
                                                             {
-                                                                if (reader.peek() == JsonToken.STRING)
+                                                                if (reader.peek() != JsonToken.NULL)
                                                                 {
-                                                                    String msg = reader.nextString();
-                                                                    ascentRetrieveFeedTask2 ascentRFT = new ascentRetrieveFeedTask2(pref, msg);
-                                                                    ascentRFT.execute();
-                                                                    if (msg != null)
+                                                                    if (reader.peek() == JsonToken.STRING)
                                                                     {
+                                                                        String msg = reader.nextString();
+                                                                        ascentRetrieveFeedTask2 ascentRFT = new ascentRetrieveFeedTask2(pref, msg);
+                                                                        ascentRFT.execute();
+                                                                        if (msg != null)
+                                                                        {
                                                                         /*
                                                                         // for testing purposes
                                                                         Toast.makeText(ascentWebview.getContext(), msg, Toast.LENGTH_LONG).show();
@@ -434,36 +464,42 @@ public class MainActivity extends AppCompatPreferenceActivity
                                                                             fo.close();
                                                                         }
                                                                         */
+                                                                        }
                                                                     }
                                                                 }
                                                             }
-                                                        }
-                                                        catch (IOException e)
-                                                        {
-                                                            Log.e("TAG", "MainActivity: IOException", e);
-                                                        } finally
-                                                        {
-                                                            try
-                                                            {
-                                                                reader.close();
-                                                            }
                                                             catch (IOException e)
                                                             {
-                                                                // NOOP
+                                                                Log.e("TAG", "MainActivity: IOException", e);
+                                                            } finally
+                                                            {
+                                                                try
+                                                                {
+                                                                    reader.close();
+                                                                }
+                                                                catch (IOException e)
+                                                                {
+                                                                    // NOOP
+                                                                }
                                                             }
                                                         }
-                                                    }
-                                                });
-                                    }
-                                }, 10000);
+                                                    });
+                                        }
+                                    }, 10000);
 
+                                }
+                                counter++;
                             }
-                            counter++;                        }
-                    });
+                        });
 
-                    ascentWebview.loadUrl("http://www.ascent.co.nz/search.aspx?T1=" + searchInput );
-
+                        ascentWebview.loadUrl("http://www.ascent.co.nz/search.aspx?T1=" + searchInput);
+                    }
+                    else
+                    {
+                        Toast.makeText(preference.getContext(), "No Internet Connection. Program will not work.", Toast.LENGTH_LONG).show();
+                    }
                     return true;
+
                 }
 
             });

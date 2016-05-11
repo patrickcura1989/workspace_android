@@ -83,43 +83,45 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
         {
             e.printStackTrace();
         }
-
-        // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
-        InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
-
-        try
+        if (null != response) // used for no internet connection, no response is received if there is no internet connection
         {
-            SAXParserImpl.newInstance(null).parse(stream,
-                    // http://stackoverflow.com/questions/24113529/how-to-get-elements-value-from-xml-using-sax-parser-in-startelement
-                    new DefaultHandler()
-                    {
-                        private boolean isName = false;
-                        private boolean isPrice = false;
-                        //private boolean isLi = false;
-                        private String priceFull = "", productNameFull = "";
-                        private int priceCounter = -1;
+            // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
+            InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
 
-                        public void startElement(String uri, String localName, String name, Attributes a)
+            try
+            {
+                SAXParserImpl.newInstance(null).parse(stream,
+                        // http://stackoverflow.com/questions/24113529/how-to-get-elements-value-from-xml-using-sax-parser-in-startelement
+                        new DefaultHandler()
                         {
-                            if (name.equalsIgnoreCase("a"))
+                            private boolean isName = false;
+                            private boolean isPrice = false;
+                            //private boolean isLi = false;
+                            private String priceFull = "", productNameFull = "";
+                            private int priceCounter = -1;
+
+                            public void startElement(String uri, String localName, String name, Attributes a)
                             {
-                                if ("dotted".equals(a.getValue("class")))
+                                if (name.equalsIgnoreCase("a"))
                                 {
-                                    searchResultsForParsing += "http://www.trademe.co.nz" + a.getValue("href") + "\n";;
-                                    urlResultsArray.add( "http://www.trademe.co.nz" + a.getValue("href"));
-                                    priceResultsArray.add("See Website");
-                                    priceCounter++;
-                                    isName = true;
+                                    if ("dotted".equals(a.getValue("class")))
+                                    {
+                                        searchResultsForParsing += "http://www.trademe.co.nz" + a.getValue("href") + "\n";
+                                        ;
+                                        urlResultsArray.add("http://www.trademe.co.nz" + a.getValue("href"));
+                                        priceResultsArray.add("See Website");
+                                        priceCounter++;
+                                        isName = true;
+                                    }
                                 }
-                            }
-                            else if (name.equalsIgnoreCase("div"))
-                            {
-                                if ("listingBuyNowPrice".equals(a.getValue("class")))
+                                else if (name.equalsIgnoreCase("div"))
                                 {
-                                    isPrice = true;
-                                    //Log.println(Log.ERROR,"log","price start");
+                                    if ("listingBuyNowPrice".equals(a.getValue("class")))
+                                    {
+                                        isPrice = true;
+                                        //Log.println(Log.ERROR,"log","price start");
+                                    }
                                 }
-                            }
                             /* // for testing purposes
                             else if (name.equalsIgnoreCase("li"))
                             {
@@ -130,47 +132,47 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
                                 }
                             }
                             */
-                        }
+                            }
 
-                        public void characters(char[] ch, int start, int length)
-                        {
-                            if (isName)
+                            public void characters(char[] ch, int start, int length)
                             {
-                                String productName = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
-                                //System.out.println(productName);
-                                productNameFull+=productName;
-                            }
-                            else if (isPrice)
-                            {
-                                String price = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
-                                //System.out.println(productName);
-                                priceFull+=price;
-                            }
+                                if (isName)
+                                {
+                                    String productName = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
+                                    //System.out.println(productName);
+                                    productNameFull += productName;
+                                }
+                                else if (isPrice)
+                                {
+                                    String price = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
+                                    //System.out.println(productName);
+                                    priceFull += price;
+                                }
                             /* // for testing purposes
                             else if (isLi)
                             {
                                 Log.println(Log.ERROR,"log","li listingBuyNowCol ongoing");
                             }
                             */
-                        }
+                            }
 
-                        public void endElement(String uri, String localName, String qName)
-                        {
-                            if (isName)
+                            public void endElement(String uri, String localName, String qName)
                             {
-                                isName = false;
-                                searchResultsForParsing += productNameFull + "\n";
-                                nameResultsArray.add(productNameFull);
-                                productNameFull = "";
-                            }
-                            else if (isPrice)
-                            {
-                                isPrice = false;
-                                searchResultsForParsing += priceFull + "\n";
-                                priceResultsArray.set(priceCounter, priceFull);
-                                priceFull = "";
-                                //Log.println(Log.ERROR,"log","price end");
-                            }
+                                if (isName)
+                                {
+                                    isName = false;
+                                    searchResultsForParsing += productNameFull + "\n";
+                                    nameResultsArray.add(productNameFull);
+                                    productNameFull = "";
+                                }
+                                else if (isPrice)
+                                {
+                                    isPrice = false;
+                                    searchResultsForParsing += priceFull + "\n";
+                                    priceResultsArray.set(priceCounter, priceFull);
+                                    priceFull = "";
+                                    //Log.println(Log.ERROR,"log","price end");
+                                }
                             /* // for testing purposes
                             else if (isLi)
                             {
@@ -178,18 +180,18 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
                                 Log.println(Log.ERROR,"log","li listingBuyNowCol end");
                             }
                             */
-                        }
-                    });
+                            }
+                        });
+            }
+            catch (SAXException e)
+            {
+                e.printStackTrace();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
-        catch (SAXException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
         return searchResultsForParsing;
     }
 

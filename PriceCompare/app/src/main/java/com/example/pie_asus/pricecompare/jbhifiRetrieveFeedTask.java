@@ -75,90 +75,92 @@ class jbhifiRetrieveFeedTask extends AsyncTask<Void, Void, String>
             e.printStackTrace();
         }
 
-        // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
-        InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
-
-        try
+        if (null != response) // used for no internet connection, no response is received if there is no internet connection
         {
-            SAXParserImpl.newInstance(null).parse(stream,
-                    // http://stackoverflow.com/questions/24113529/how-to-get-elements-value-from-xml-using-sax-parser-in-startelement
-                    new DefaultHandler()
-                    {
-                        private boolean isName = false;
-                        private boolean isPrice = false;
-                        private int priceCounter = 0;
+            // http://stackoverflow.com/questions/32102166/standardcharsets-utf-8-on-lower-api-lower-than-19
+            InputStream stream = new ByteArrayInputStream(response.getBytes(Charset.forName("UTF-8")));
 
-                        public void startElement(String uri, String localName, String name, Attributes a)
+            try
+            {
+                SAXParserImpl.newInstance(null).parse(stream,
+                        // http://stackoverflow.com/questions/24113529/how-to-get-elements-value-from-xml-using-sax-parser-in-startelement
+                        new DefaultHandler()
                         {
-                            if (name.equalsIgnoreCase("h2"))
+                            private boolean isName = false;
+                            private boolean isPrice = false;
+                            private int priceCounter = 0;
+
+                            public void startElement(String uri, String localName, String name, Attributes a)
                             {
-                                if ("title_list".equals(a.getValue("class")))
+                                if (name.equalsIgnoreCase("h2"))
                                 {
-                                    isName = true;
+                                    if ("title_list".equals(a.getValue("class")))
+                                    {
+                                        isName = true;
+                                    }
                                 }
-                            }
-                            else if (name.equalsIgnoreCase("p"))
-                            {
-                                if ("price_list".equals(a.getValue("class")))
+                                else if (name.equalsIgnoreCase("p"))
                                 {
-                                    isPrice = true;
+                                    if ("price_list".equals(a.getValue("class")))
+                                    {
+                                        isPrice = true;
+                                    }
                                 }
-                            }
-                            else if (name.equalsIgnoreCase("a"))
-                            {
-                                if ("image_list".equals(a.getValue("class")))
+                                else if (name.equalsIgnoreCase("a"))
                                 {
-                                    searchResultsForParsing = searchResultsForParsing + "https://shop.jbhifi.co.nz"+a.getValue("href") + "$";
+                                    if ("image_list".equals(a.getValue("class")))
+                                    {
+                                        searchResultsForParsing = searchResultsForParsing + "https://shop.jbhifi.co.nz" + a.getValue("href") + "$";
+                                    }
                                 }
+
                             }
 
-                        }
-
-                        public void characters(char[] ch, int start, int length)
-                        {
-                            if (isName)
+                            public void characters(char[] ch, int start, int length)
                             {
-                                String content = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
-                                //System.out.println(content);
-                                searchResults = searchResults + content + "\n";
-                                searchResultsForParsing = searchResultsForParsing + content + " ";
-                            }
-                            else if (isPrice)
-                            {
-                                if (priceCounter == 0)
+                                if (isName)
                                 {
                                     String content = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
                                     //System.out.println(content);
                                     searchResults = searchResults + content + "\n";
-                                    searchResultsForParsing = searchResultsForParsing + content + "$";
+                                    searchResultsForParsing = searchResultsForParsing + content + " ";
                                 }
-                                priceCounter++;
+                                else if (isPrice)
+                                {
+                                    if (priceCounter == 0)
+                                    {
+                                        String content = (new String(ch, start, length)).trim().replaceAll("[\\t\\n\\r\\s]+", " ");
+                                        //System.out.println(content);
+                                        searchResults = searchResults + content + "\n";
+                                        searchResultsForParsing = searchResultsForParsing + content + "$";
+                                    }
+                                    priceCounter++;
+                                }
                             }
-                        }
 
-                        public void endElement(String uri, String localName, String qName)
-                        {
-                            if (isName)
+                            public void endElement(String uri, String localName, String qName)
                             {
-                                isName = false;
+                                if (isName)
+                                {
+                                    isName = false;
+                                }
+                                else if (isPrice)
+                                {
+                                    isPrice = false;
+                                    priceCounter = 0;
+                                }
                             }
-                            else if (isPrice)
-                            {
-                                isPrice = false;
-                                priceCounter = 0;
-                            }
-                        }
-                    });
+                        });
+            }
+            catch (SAXException e)
+            {
+                e.printStackTrace();
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
-        catch (SAXException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-
         return searchResultsForParsing;
     }
 
@@ -195,7 +197,7 @@ class jbhifiRetrieveFeedTask extends AsyncTask<Void, Void, String>
             Preference resultPreference = new Preference(preference.getContext());
             resultPreference.setKey("pref_name");
             resultPreference.setTitle(nameResultsArray.get(i));
-            resultPreference.setSummary(priceResultsArray.get(i));
+            resultPreference.setSummary("$"+priceResultsArray.get(i));
             Intent redirect = new Intent();
             redirect.setData(Uri.parse(urlResultsArray.get(i)));
             redirect.setAction("android.intent.action.VIEW");
