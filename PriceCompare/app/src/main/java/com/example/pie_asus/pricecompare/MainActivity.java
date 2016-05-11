@@ -386,7 +386,7 @@ public class MainActivity extends AppCompatPreferenceActivity
                             }
                         });
                         String searchInput = (newValue + "").replaceAll("\\s+", "+");
-                        String pbtechSearchInput = (newValue + "").replaceAll("\\s+", "+")+"+%25"; // workaround to pbtech issues with searches like: apple, iphone, macbook
+                        String pbtechSearchInput = (newValue + "").replaceAll("\\s+", "+")+"+%27"; // workaround to pbtech issues with searches like: apple, iphone, macbook
 
                         pbtechWebview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + pbtechSearchInput + "&p=search&o=price&d=a");
 
