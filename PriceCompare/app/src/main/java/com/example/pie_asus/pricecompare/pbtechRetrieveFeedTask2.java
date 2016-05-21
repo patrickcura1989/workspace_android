@@ -201,7 +201,7 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
     protected void onPostExecute(String result)
     {
         //Log.println(Log.ERROR, "log", "******RESULT" + result + "++++++++");
-        System.out.println(result);
+        //System.out.println(result);
         /* // For Testing Purposes
         File file = new File(Environment.getExternalStorageDirectory() + File.separator + "parse.txt");
         try

@@ -24,6 +24,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -43,7 +44,10 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.List;
 
@@ -285,6 +289,11 @@ public class MainActivity extends AppCompatPreferenceActivity
                         tmRetrieveFeedTask tmRFT = new tmRetrieveFeedTask(preference, newValue + "");
                         tmRFT.execute();
 
+                        /*
+                        ascentRetrieveFeedTask aRFT = new ascentRetrieveFeedTask(preference, newValue + "");
+                        aRFT.execute();
+                       */
+
                         pbtechWebview.setWebViewClient(new WebViewClient()
                         {
                             int counter = 0;
@@ -386,9 +395,10 @@ public class MainActivity extends AppCompatPreferenceActivity
                             }
                         });
                         String searchInput = (newValue + "").replaceAll("\\s+", "+");
-                        String pbtechSearchInput = (newValue + "").replaceAll("\\s+", "+")+"+%27"; // workaround to pbtech issues with searches like: apple, iphone, macbook
+                        String pbtechSearchInput = (newValue + "").replaceAll("\\s+", "+") + "+%27"; // workaround to pbtech issues with searches like: apple, iphone, macbook
 
                         pbtechWebview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + pbtechSearchInput + "&p=search&o=price&d=a");
+
 
                         ascentWebview.setWebViewClient(new WebViewClient()
                         {
@@ -451,19 +461,19 @@ public class MainActivity extends AppCompatPreferenceActivity
                                                                         ascentRFT.execute();
                                                                         if (msg != null)
                                                                         {
-                                                                        /*
-                                                                        // for testing purposes
-                                                                        Toast.makeText(ascentWebview.getContext(), msg, Toast.LENGTH_LONG).show();
-                                                                        File file = new File(Environment.getExternalStorageDirectory() + File.separator + "test.html");
-                                                                        file.createNewFile();
-                                                                        //write the bytes in file
-                                                                        if (file.exists())
-                                                                        {
-                                                                            OutputStream fo = new FileOutputStream(file);
-                                                                            fo.write(msg.getBytes());
-                                                                            fo.close();
-                                                                        }
-                                                                        */
+                                                                            /*
+                                                                            // for testing purposes
+                                                                            Toast.makeText(ascentWebview.getContext(), msg, Toast.LENGTH_LONG).show();
+                                                                            File file = new File(Environment.getExternalStorageDirectory() + File.separator + "test.html");
+                                                                            file.createNewFile();
+                                                                            //write the bytes in file
+                                                                            if (file.exists())
+                                                                            {
+                                                                                OutputStream fo = new FileOutputStream(file);
+                                                                                fo.write(msg.getBytes());
+                                                                                fo.close();
+                                                                            }
+                                                                            */
                                                                         }
                                                                     }
                                                                 }
@@ -493,6 +503,7 @@ public class MainActivity extends AppCompatPreferenceActivity
                         });
 
                         ascentWebview.loadUrl("http://www.ascent.co.nz/search.aspx?T1=" + searchInput);
+
                     }
                     else
                     {

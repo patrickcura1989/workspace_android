@@ -136,6 +136,7 @@ class ascentRetrieveFeedTask extends AsyncTask<Void, Void, String>
                                 {
                                     searchResultsForParsing += "http://www.ascent.co.nz/" + a.getValue("href") + "\n";
                                     urlResultsArray.add("http://www.ascent.co.nz/" + a.getValue("href"));
+                                    isTD = false;
                                     isName = true;
                                 }
                             }
@@ -194,7 +195,27 @@ class ascentRetrieveFeedTask extends AsyncTask<Void, Void, String>
 
     protected void onPostExecute(String result)
     {
-        System.out.println(result);
+        //System.out.println(result);
+
+        // For Testing Purposes
+        File file = new File(Environment.getExternalStorageDirectory() + File.separator + "parse.txt");
+        try
+        {
+            file.createNewFile();
+            //write the bytes in file
+            if (file.exists())
+            {
+                OutputStream fo = new FileOutputStream(file);
+                fo.write(result.getBytes());
+                fo.close();
+            }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_ascent_search_results");
         preferenceCategory.removeAll();

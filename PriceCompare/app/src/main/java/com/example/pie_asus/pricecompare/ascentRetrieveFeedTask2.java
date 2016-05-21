@@ -95,6 +95,7 @@ class ascentRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
                                     searchResultsForParsing += "http://www.ascent.co.nz/" + a.getValue("href") + "\n";
                                     urlResultsArray.add("http://www.ascent.co.nz/" + a.getValue("href"));
                                     isName = true;
+                                    isTD = false; // there are times when there are multiple a elements in a td
                                 }
                             }
                         }
