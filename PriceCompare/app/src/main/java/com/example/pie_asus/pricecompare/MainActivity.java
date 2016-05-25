@@ -258,6 +258,7 @@ public class MainActivity extends AppCompatPreferenceActivity
             ascentWebview.getSettings().setUserAgentString(ua);
 
             final Preference pref = findPreference("example_text");
+            pref.setSummary("Tap Here to Input Search Keyword");
             pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
             {
 

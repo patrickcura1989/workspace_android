@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import org.ccil.cowan.tagsoup.jaxp.SAXParserImpl;
 import org.xml.sax.Attributes;
@@ -190,6 +191,18 @@ class jbhifiRetrieveFeedTask extends AsyncTask<Void, Void, String>
             {
                 priceResultsArray.add(resultsArray[i]);
             }
+        }
+
+        //Toast.makeText(preference.getContext(), "Here "+ priceResultsArray.size(), Toast.LENGTH_LONG).show();
+
+        if(priceResultsArray.size() <=0)
+        {
+            //Toast.makeText(preference.getContext(), "Here", Toast.LENGTH_LONG).show();
+            Preference resultPreference = new Preference(preference.getContext());
+            resultPreference.setKey("pref_name");
+            resultPreference.setTitle("No Results Found");
+            //resultPreference.setSummary("$"+priceResultsArray.get(i));
+            preferenceCategory.addPreference(resultPreference);
         }
 
         for (int i = 0; i < priceResultsArray.size(); i++)
