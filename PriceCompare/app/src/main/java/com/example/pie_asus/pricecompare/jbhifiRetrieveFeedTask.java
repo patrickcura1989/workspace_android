@@ -2,11 +2,18 @@ package com.example.pie_asus.pricecompare;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
+import android.util.AttributeSet;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.ccil.cowan.tagsoup.jaxp.SAXParserImpl;
@@ -17,6 +24,8 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -28,6 +37,8 @@ import okhttp3.Response;
  * Created by PIE-ASUS on 24/03/2016.
  * http://stackoverflow.com/questions/17634643/how-to-add-a-hyperlink-into-a-preference-screen-preferenceactivity
  * http://developer.android.com/reference/android/os/AsyncTask.html
+ * http://stackoverflow.com/questions/3375166/android-drawable-images-from-url
+ * http://stackoverflow.com/questions/9220039/android-preferencescreen-title-in-two-lines
  */
 
 class jbhifiRetrieveFeedTask extends AsyncTask<Void, Void, String>
@@ -40,6 +51,8 @@ class jbhifiRetrieveFeedTask extends AsyncTask<Void, Void, String>
     private String searchResults = "", searchInput = "", searchResultsForParsing = "";
 
     private Preference preference;
+
+    ArrayList<Drawable> iconResultsArray = new ArrayList<Drawable>();
 
     // http://stackoverflow.com/questions/10996479/how-to-update-a-textview-of-an-activity-from-another-classssss
     public jbhifiRetrieveFeedTask(Preference preference, String searchInput)
@@ -89,6 +102,7 @@ class jbhifiRetrieveFeedTask extends AsyncTask<Void, Void, String>
                         {
                             private boolean isName = false;
                             private boolean isPrice = false;
+                            private boolean isA = false;
                             private int priceCounter = 0;
 
                             public void startElement(String uri, String localName, String name, Attributes a)
@@ -112,9 +126,26 @@ class jbhifiRetrieveFeedTask extends AsyncTask<Void, Void, String>
                                     if ("image_list".equals(a.getValue("class")))
                                     {
                                         searchResultsForParsing = searchResultsForParsing + "https://shop.jbhifi.co.nz" + a.getValue("href") + "$";
+                                        isA = true;
                                     }
                                 }
-
+                                else if (name.equalsIgnoreCase("img"))
+                                {
+                                    if(isA)
+                                    {
+                                        Drawable icon = null;
+                                        try
+                                        {
+                                            icon = drawableFromUrl("https://shop.jbhifi.co.nz" + a.getValue("src"));
+                                        }
+                                        catch (IOException e)
+                                        {
+                                            e.printStackTrace();
+                                        }
+                                        iconResultsArray.add(icon);
+                                        isA=false;
+                                    }
+                                }
                             }
 
                             public void characters(char[] ch, int start, int length)
@@ -207,7 +238,7 @@ class jbhifiRetrieveFeedTask extends AsyncTask<Void, Void, String>
 
         for (int i = 0; i < priceResultsArray.size(); i++)
         {
-            Preference resultPreference = new Preference(preference.getContext());
+            TwoLinePreference resultPreference = new TwoLinePreference(preference.getContext());
             resultPreference.setKey("pref_name");
             resultPreference.setTitle(nameResultsArray.get(i));
             resultPreference.setSummary("$"+priceResultsArray.get(i));
@@ -215,6 +246,9 @@ class jbhifiRetrieveFeedTask extends AsyncTask<Void, Void, String>
             redirect.setData(Uri.parse(urlResultsArray.get(i)));
             redirect.setAction("android.intent.action.VIEW");
             resultPreference.setIntent(redirect);
+
+            resultPreference.setIcon(iconResultsArray.get(i));
+
             preferenceCategory.addPreference(resultPreference);
             //Log.println(Log.ERROR,"log","******"+result+"++++++++");
         }
@@ -222,4 +256,15 @@ class jbhifiRetrieveFeedTask extends AsyncTask<Void, Void, String>
     }
 
 
+    public Drawable drawableFromUrl(String url) throws IOException {
+        Bitmap x;
+
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.connect();
+        InputStream input = connection.getInputStream();
+
+        x = BitmapFactory.decodeStream(input);
+        return new BitmapDrawable(x);
+    }
 }
+

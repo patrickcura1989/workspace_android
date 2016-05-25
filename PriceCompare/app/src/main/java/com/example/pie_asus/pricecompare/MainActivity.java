@@ -7,6 +7,7 @@ http://stackoverflow.com/questions/8309796/want-to-load-desktop-version-in-my-we
 http://stackoverflow.com/questions/15874117/how-to-set-delay-in-android
 Log.println(Log.ERROR,"log","hello");
 http://stackoverflow.com/questions/9521232/how-to-catch-an-exception-if-the-internet-or-signal-is-down
+http://stackoverflow.com/questions/26615889/how-to-change-the-launcher-logo-of-an-app-in-android-studio
  */
 
 package com.example.pie_asus.pricecompare;

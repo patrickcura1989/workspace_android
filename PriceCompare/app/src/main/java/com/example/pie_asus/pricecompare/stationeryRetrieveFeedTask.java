@@ -174,7 +174,7 @@ class stationeryRetrieveFeedTask extends AsyncTask<Void, Void, String>
 
         for (int i = 0; i < nameResultsArray.size(); i++)
         {
-            Preference resultPreference = new Preference(preference.getContext());
+            TwoLinePreference resultPreference = new TwoLinePreference(preference.getContext());
             resultPreference.setKey("pref_name");
             resultPreference.setTitle(nameResultsArray.get(i));
             resultPreference.setSummary(priceResultsArray.get(i));
