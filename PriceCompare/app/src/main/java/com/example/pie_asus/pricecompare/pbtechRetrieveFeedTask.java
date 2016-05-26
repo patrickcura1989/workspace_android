@@ -75,6 +75,7 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
     {
         this.preference = preference;
         this.searchInput = searchInput.replaceAll("\\s+", "+");
+        /*
         try
         {
             this.searchInput = URLEncoder.encode(searchInput, "UTF-8");
@@ -83,6 +84,7 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
         {
             e.printStackTrace();
         }
+        */
 
         final WebView webview = webviewInput;
 

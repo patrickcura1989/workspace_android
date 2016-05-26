@@ -465,6 +465,7 @@ public class MainActivity extends AppCompatPreferenceActivity
                         String searchInput = (newValue + "").replaceAll("\\s+", "+");
                         String pbtechSearchInput = (newValue + "").replaceAll("\\s+", "+") + "+%27"; // workaround to pbtech issues with searches like: apple, iphone, macbook
 
+                        /*
                         try
                         {
                             searchInput = URLEncoder.encode((newValue + ""), "UTF-8");
@@ -474,6 +475,7 @@ public class MainActivity extends AppCompatPreferenceActivity
                         {
                             e.printStackTrace();
                         }
+                        */
 
                         pbtechWebview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + pbtechSearchInput + "&p=search&o=price&d=a");
 

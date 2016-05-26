@@ -59,7 +59,10 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
     public tmRetrieveFeedTask(Preference preference, String searchInput)
     {
         this.preference = preference;
-        this.searchInput = searchInput.replaceAll("\\s+", "+");
+        //this.searchInput = searchInput;
+        this.searchInput = searchInput.replaceAll("[^\\w ]+", "");
+        //this.searchInput = searchInput.replaceAll("\\s+", "+");
+        /*
         try
         {
             this.searchInput = URLEncoder.encode(searchInput, "UTF-8");
@@ -68,6 +71,7 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
         {
             e.printStackTrace();
         }
+        */
     }
 
     public tmRetrieveFeedTask()
@@ -95,10 +99,11 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
         {
             //System.out.println("http://www.trademe.co.nz/Browse/SearchResults.aspx?sort_order=price_asc&searchString=" + this.searchInput + "&type=Search&searchType=all&user_region=100&user_district=0&generalSearch_keypresses=11&generalSearch_suggested=0&generalSearch_suggestedCategory=&buy=buynow&v=List&pay=paynow");
             response = example.run("http://www.trademe.co.nz/Browse/SearchResults.aspx?sort_order=price_asc&searchString=" + this.searchInput + "&type=Search&searchType=all&user_region=100&user_district=0&generalSearch_keypresses=11&generalSearch_suggested=0&generalSearch_suggestedCategory=&buy=buynow&v=List&pay=paynow");
+            //response = example.run("http://www.trademe.co.nz/Browse/SearchResults.aspx?sort_order=price_asc&searchString=" + URLEncoder.encode(this.searchInput, "UTF-8") + "&type=Search&searchType=all&user_region=100&user_district=0&generalSearch_keypresses=11&generalSearch_suggested=0&generalSearch_suggestedCategory=&buy=buynow&v=List&pay=paynow");
             /*
             // For Testing Purposes
             //System.out.println("----------------->"+Environment.getExternalStorageDirectory());
-            File file = new File(Environment.getExternalStorageDirectory() + File.separator + "parse.txt");
+            File file = new File(Environment.getExternalStorageDirectory() + File.separator + "parse.html");
 
             file.createNewFile();
             //write the bytes in file
