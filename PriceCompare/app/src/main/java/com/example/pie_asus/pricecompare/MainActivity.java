@@ -258,8 +258,27 @@ public class MainActivity extends AppCompatPreferenceActivity
             String ua = "Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.0.4) Gecko/20100101 Firefox/4.0";
             ascentWebview.getSettings().setUserAgentString(ua);
 
+            findPreference("pref_category_jb_results_key").setEnabled(false);
+            findPreference("pref_category_pb_results_key").setEnabled(false);
+            findPreference("pref_category_ascent_results_key").setEnabled(false);
+            findPreference("pref_category_noel_results_key").setEnabled(false);
+            findPreference("pref_category_hn_results_key").setEnabled(false);
+            findPreference("pref_category_whs_results_key").setEnabled(false);
+            findPreference("pref_category_wh_results_key").setEnabled(false);
+            findPreference("pref_category_tm_results_key").setEnabled(false);
+
+            findPreference("pref_category_jb_results_key").setSelectable(false);
+            findPreference("pref_category_pb_results_key").setSelectable(false);
+            findPreference("pref_category_ascent_results_key").setSelectable(false);
+            findPreference("pref_category_noel_results_key").setSelectable(false);
+            findPreference("pref_category_hn_results_key").setSelectable(false);
+            findPreference("pref_category_whs_results_key").setSelectable(false);
+            findPreference("pref_category_wh_results_key").setSelectable(false);
+            findPreference("pref_category_tm_results_key").setSelectable(false);
+
+
             final Preference pref = findPreference("example_text");
-            pref.setSummary("Tap Here to Input Search Keyword");
+            pref.setSummary("...");
             pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
             {
 
@@ -269,6 +288,24 @@ public class MainActivity extends AppCompatPreferenceActivity
                 {
                     //Log.println(Log.ERROR,"log","hello");
                     preference.setSummary(newValue + "");
+
+                    findPreference("pref_category_jb_results_key").setEnabled(true);
+                    findPreference("pref_category_pb_results_key").setEnabled(true);
+                    findPreference("pref_category_ascent_results_key").setEnabled(true);
+                    findPreference("pref_category_noel_results_key").setEnabled(true);
+                    findPreference("pref_category_hn_results_key").setEnabled(true);
+                    findPreference("pref_category_whs_results_key").setEnabled(true);
+                    findPreference("pref_category_wh_results_key").setEnabled(true);
+                    findPreference("pref_category_tm_results_key").setEnabled(true);
+
+                    findPreference("pref_category_jb_results_key").setSelectable(true);
+                    findPreference("pref_category_pb_results_key").setSelectable(true);
+                    findPreference("pref_category_ascent_results_key").setSelectable(true);
+                    findPreference("pref_category_noel_results_key").setSelectable(true);
+                    findPreference("pref_category_hn_results_key").setSelectable(true);
+                    findPreference("pref_category_whs_results_key").setSelectable(true);
+                    findPreference("pref_category_wh_results_key").setSelectable(true);
+                    findPreference("pref_category_tm_results_key").setSelectable(true);
 
                     if (isOnline())
                     {

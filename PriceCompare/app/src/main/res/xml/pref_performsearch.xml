@@ -19,7 +19,7 @@
     </PreferenceCategory>
 
     <PreferenceScreen
-        android:key="pref_category_search_results_key"
+        android:key="pref_category_jb_results_key"
         android:title="@string/pref_jbhifi_title"
         android:persistent="false">
 
@@ -30,7 +30,7 @@
     </PreferenceScreen>
 
     <PreferenceScreen
-        android:key="pref_category_search_results_key"
+        android:key="pref_category_pb_results_key"
         android:title="@string/pref_pbtech_title"
         android:persistent="false">
 
@@ -41,7 +41,7 @@
     </PreferenceScreen>
 
     <PreferenceScreen
-        android:key="pref_category_search_results_key"
+        android:key="pref_category_ascent_results_key"
         android:title="@string/pref_ascent_title"
         android:persistent="false">
 
@@ -52,7 +52,7 @@
     </PreferenceScreen>
 
     <PreferenceScreen
-        android:key="pref_category_search_results_key"
+        android:key="pref_category_noel_results_key"
         android:title="@string/pref_noel_title"
         android:persistent="false">
 
@@ -63,7 +63,7 @@
     </PreferenceScreen>
 
     <PreferenceScreen
-        android:key="pref_category_search_results_key"
+        android:key="pref_category_hn_results_key"
         android:title="@string/pref_harvey_title"
         android:persistent="false">
 
@@ -74,7 +74,7 @@
     </PreferenceScreen>
 
     <PreferenceScreen
-        android:key="pref_category_search_results_key"
+        android:key="pref_category_whs_results_key"
         android:title="@string/pref_stationery_title"
         android:persistent="false">
 
@@ -85,7 +85,7 @@
     </PreferenceScreen>
 
     <PreferenceScreen
-        android:key="pref_category_search_results_key"
+        android:key="pref_category_wh_results_key"
         android:title="@string/pref_wh_title"
         android:persistent="false">
 
@@ -96,7 +96,7 @@
     </PreferenceScreen>
 
     <PreferenceScreen
-        android:key="pref_category_search_results_key"
+        android:key="pref_category_tm_results_key"
         android:title="@string/pref_tm_title"
         android:persistent="false">
 

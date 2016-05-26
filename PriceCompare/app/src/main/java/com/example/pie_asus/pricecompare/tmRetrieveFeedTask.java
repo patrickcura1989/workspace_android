@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.preference.Preference;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceManager;
@@ -15,8 +16,12 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -75,9 +80,26 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
     {
         tmRetrieveFeedTask example = new tmRetrieveFeedTask();
         String response = null;
+
+
         try
         {
-            response = example.run("http://www.trademe.co.nz/Browse/SearchResults.aspx?sort_order=price_asc&searchString=" + this.searchInput + "&type=Search&searchType=all&user_region=100&user_district=0&generalSearch_keypresses=11&generalSearch_suggested=0&generalSearch_suggestedCategory=&buy=buynow&v=List&pay=paynow");
+            //System.out.println("http://www.trademe.co.nz/Browse/SearchResults.aspx?sort_order=price_asc&searchString=" + this.searchInput + "&type=Search&searchType=all&user_region=100&user_district=0&generalSearch_keypresses=11&generalSearch_suggested=0&generalSearch_suggestedCategory=&buy=buynow&v=List&pay=paynow");
+            response = example.run("http://www.trademe.co.nz/Browse/SearchResults.aspx?sort_order=price_asc&searchString=" + URLEncoder.encode(this.searchInput, "UTF-8") + "&type=Search&searchType=all&user_region=100&user_district=0&generalSearch_keypresses=11&generalSearch_suggested=0&generalSearch_suggestedCategory=&buy=buynow&v=List&pay=paynow");
+            /*
+            // For Testing Purposes
+            //System.out.println("----------------->"+Environment.getExternalStorageDirectory());
+            File file = new File(Environment.getExternalStorageDirectory() + File.separator + "parse.txt");
+
+            file.createNewFile();
+            //write the bytes in file
+            if (file.exists())
+            {
+                OutputStream fo = new FileOutputStream(file);
+                fo.write(response.getBytes());
+                fo.close();
+            }
+            */
         }
         catch (IOException e)
         {
@@ -107,11 +129,11 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
                                     if ("dotted".equals(a.getValue("class")))
                                     {
                                         searchResultsForParsing += "http://www.trademe.co.nz" + a.getValue("href") + "\n";
-                                        ;
                                         urlResultsArray.add("http://www.trademe.co.nz" + a.getValue("href"));
                                         priceResultsArray.add("See Website");
                                         priceCounter++;
                                         isName = true;
+                                        //System.out.println(searchResultsForParsing);
                                     }
                                 }
                                 else if (name.equalsIgnoreCase("div"))
@@ -119,7 +141,7 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
                                     if ("listingBuyNowPrice".equals(a.getValue("class")))
                                     {
                                         isPrice = true;
-                                        //Log.println(Log.ERROR,"log","price start");
+                                        //Log.println(Log.ERROR,"log", name + " " + a.getValue("class"));
                                     }
                                 }
                             /* // for testing purposes
@@ -162,6 +184,7 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
                                 {
                                     isName = false;
                                     searchResultsForParsing += productNameFull + "\n";
+                                    //System.out.println(searchResultsForParsing);
                                     nameResultsArray.add(productNameFull);
                                     productNameFull = "";
                                 }
@@ -169,6 +192,7 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
                                 {
                                     isPrice = false;
                                     searchResultsForParsing += priceFull + "\n";
+                                    //System.out.println(searchResultsForParsing);
                                     priceResultsArray.set(priceCounter, priceFull);
                                     priceFull = "";
                                     //Log.println(Log.ERROR,"log","price end");

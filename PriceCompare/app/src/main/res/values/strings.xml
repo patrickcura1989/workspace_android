@@ -11,7 +11,7 @@
         based on your message history
     </string>
 
-    <string name="pref_title_keyword">Search by Keyword</string>
+    <string name="pref_title_keyword">Tap Here to Input Search Keyword</string>
     <string name="pref_default_keyword">...</string>
 
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
