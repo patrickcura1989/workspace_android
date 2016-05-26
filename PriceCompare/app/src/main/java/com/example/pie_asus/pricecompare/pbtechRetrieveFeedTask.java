@@ -33,11 +33,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpCookie;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -73,6 +75,14 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
     {
         this.preference = preference;
         this.searchInput = searchInput.replaceAll("\\s+", "+");
+        try
+        {
+            this.searchInput = URLEncoder.encode(searchInput, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
 
         final WebView webview = webviewInput;
 
@@ -324,7 +334,7 @@ class pbtechRetrieveFeedTask extends AsyncTask<Void, Void, String>
         //Log.println(Log.ERROR, "log", "******" + result + "++++++++");
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_pbtech_search_results");
-        preferenceCategory.removeAll();
+        //preferenceCategory.removeAll();
 
         String[] resultsArray = result.split("\\$");
 

@@ -21,6 +21,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -59,6 +60,14 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
     {
         this.preference = preference;
         this.searchInput = searchInput.replaceAll("\\s+", "+");
+        try
+        {
+            this.searchInput = URLEncoder.encode(searchInput, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public tmRetrieveFeedTask()
@@ -85,7 +94,7 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
         try
         {
             //System.out.println("http://www.trademe.co.nz/Browse/SearchResults.aspx?sort_order=price_asc&searchString=" + this.searchInput + "&type=Search&searchType=all&user_region=100&user_district=0&generalSearch_keypresses=11&generalSearch_suggested=0&generalSearch_suggestedCategory=&buy=buynow&v=List&pay=paynow");
-            response = example.run("http://www.trademe.co.nz/Browse/SearchResults.aspx?sort_order=price_asc&searchString=" + URLEncoder.encode(this.searchInput, "UTF-8") + "&type=Search&searchType=all&user_region=100&user_district=0&generalSearch_keypresses=11&generalSearch_suggested=0&generalSearch_suggestedCategory=&buy=buynow&v=List&pay=paynow");
+            response = example.run("http://www.trademe.co.nz/Browse/SearchResults.aspx?sort_order=price_asc&searchString=" + this.searchInput + "&type=Search&searchType=all&user_region=100&user_district=0&generalSearch_keypresses=11&generalSearch_suggested=0&generalSearch_suggestedCategory=&buy=buynow&v=List&pay=paynow");
             /*
             // For Testing Purposes
             //System.out.println("----------------->"+Environment.getExternalStorageDirectory());
@@ -224,7 +233,7 @@ class tmRetrieveFeedTask extends AsyncTask<Void, Void, String>
         //System.out.println(result);
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_tm_search_results");
-        preferenceCategory.removeAll();
+        //preferenceCategory.removeAll();
 
         //Toast.makeText(preference.getContext(), "Here "+ priceResultsArray.size(), Toast.LENGTH_LONG).show();
 

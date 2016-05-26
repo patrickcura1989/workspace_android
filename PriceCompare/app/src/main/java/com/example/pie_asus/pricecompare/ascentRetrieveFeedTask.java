@@ -21,6 +21,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -58,6 +60,14 @@ class ascentRetrieveFeedTask extends AsyncTask<Void, Void, String>
     {
         this.preference = preference;
         this.searchInput = searchInput.replaceAll("\\s+", "+");
+        try
+        {
+            this.searchInput = URLEncoder.encode(searchInput, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public ascentRetrieveFeedTask()
@@ -196,7 +206,7 @@ class ascentRetrieveFeedTask extends AsyncTask<Void, Void, String>
     protected void onPostExecute(String result)
     {
         //System.out.println(result);
-
+        /*
         // For Testing Purposes
         File file = new File(Environment.getExternalStorageDirectory() + File.separator + "parse.txt");
         try
@@ -214,11 +224,11 @@ class ascentRetrieveFeedTask extends AsyncTask<Void, Void, String>
         {
             e.printStackTrace();
         }
-
+        */
 
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_ascent_search_results");
-        preferenceCategory.removeAll();
+        //preferenceCategory.removeAll();
 
         //Toast.makeText(preference.getContext(), "Here "+ priceResultsArray.size(), Toast.LENGTH_LONG).show();
 

@@ -175,7 +175,7 @@ class ascentRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
         */
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_ascent_search_results");
-        preferenceCategory.removeAll();
+        //preferenceCategory.removeAll();
 
         //Toast.makeText(preference.getContext(), "Here "+ priceResultsArray.size(), Toast.LENGTH_LONG).show();
 

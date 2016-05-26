@@ -24,8 +24,10 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -59,6 +61,14 @@ class jbhifiRetrieveFeedTask extends AsyncTask<Void, Void, String>
     {
         this.preference = preference;
         this.searchInput = searchInput.replaceAll("\\s+", "+");
+        try
+        {
+            this.searchInput = URLEncoder.encode(searchInput, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public jbhifiRetrieveFeedTask()
@@ -200,7 +210,7 @@ class jbhifiRetrieveFeedTask extends AsyncTask<Void, Void, String>
     {
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_jbhifi_search_results");
-        preferenceCategory.removeAll();
+        //preferenceCategory.removeAll();
 
         String[] resultsArray = result.split("\\$");
 

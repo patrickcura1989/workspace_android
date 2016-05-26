@@ -30,6 +30,7 @@ import android.os.Handler;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
@@ -50,6 +51,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 
 /**
@@ -289,26 +292,51 @@ public class MainActivity extends AppCompatPreferenceActivity
                     //Log.println(Log.ERROR,"log","hello");
                     preference.setSummary(newValue + "");
 
-                    findPreference("pref_category_jb_results_key").setEnabled(true);
-                    findPreference("pref_category_pb_results_key").setEnabled(true);
-                    findPreference("pref_category_ascent_results_key").setEnabled(true);
-                    findPreference("pref_category_noel_results_key").setEnabled(true);
-                    findPreference("pref_category_hn_results_key").setEnabled(true);
-                    findPreference("pref_category_whs_results_key").setEnabled(true);
-                    findPreference("pref_category_wh_results_key").setEnabled(true);
-                    findPreference("pref_category_tm_results_key").setEnabled(true);
-
-                    findPreference("pref_category_jb_results_key").setSelectable(true);
-                    findPreference("pref_category_pb_results_key").setSelectable(true);
-                    findPreference("pref_category_ascent_results_key").setSelectable(true);
-                    findPreference("pref_category_noel_results_key").setSelectable(true);
-                    findPreference("pref_category_hn_results_key").setSelectable(true);
-                    findPreference("pref_category_whs_results_key").setSelectable(true);
-                    findPreference("pref_category_wh_results_key").setSelectable(true);
-                    findPreference("pref_category_tm_results_key").setSelectable(true);
-
                     if (isOnline())
                     {
+
+                        PreferenceManager preferenceManager = preference.getPreferenceManager();
+                        PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_harvey_search_results");
+                        preferenceCategory.removeAll();
+
+                        preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_jbhifi_search_results");
+                        preferenceCategory.removeAll();
+
+                        preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_noel_search_results");
+                        preferenceCategory.removeAll();
+
+                        preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_pbtech_search_results");
+                        preferenceCategory.removeAll();
+
+                        preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_ascent_search_results");
+                        preferenceCategory.removeAll();
+
+                        preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_stationery_search_results");
+                        preferenceCategory.removeAll();
+
+                        preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_tm_search_results");
+                        preferenceCategory.removeAll();
+
+                        preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_wh_search_results");
+                        preferenceCategory.removeAll();
+
+                        findPreference("pref_category_jb_results_key").setEnabled(true);
+                        findPreference("pref_category_pb_results_key").setEnabled(true);
+                        findPreference("pref_category_ascent_results_key").setEnabled(true);
+                        findPreference("pref_category_noel_results_key").setEnabled(true);
+                        findPreference("pref_category_hn_results_key").setEnabled(true);
+                        findPreference("pref_category_whs_results_key").setEnabled(true);
+                        findPreference("pref_category_wh_results_key").setEnabled(true);
+                        findPreference("pref_category_tm_results_key").setEnabled(true);
+
+                        findPreference("pref_category_jb_results_key").setSelectable(true);
+                        findPreference("pref_category_pb_results_key").setSelectable(true);
+                        findPreference("pref_category_ascent_results_key").setSelectable(true);
+                        findPreference("pref_category_noel_results_key").setSelectable(true);
+                        findPreference("pref_category_hn_results_key").setSelectable(true);
+                        findPreference("pref_category_whs_results_key").setSelectable(true);
+                        findPreference("pref_category_wh_results_key").setSelectable(true);
+                        findPreference("pref_category_tm_results_key").setSelectable(true);
 
                         jbhifiRetrieveFeedTask jbhifiRFT = new jbhifiRetrieveFeedTask(preference, newValue + "");
                         jbhifiRFT.execute();
@@ -433,8 +461,19 @@ public class MainActivity extends AppCompatPreferenceActivity
                                 counter++;
                             }
                         });
+
                         String searchInput = (newValue + "").replaceAll("\\s+", "+");
                         String pbtechSearchInput = (newValue + "").replaceAll("\\s+", "+") + "+%27"; // workaround to pbtech issues with searches like: apple, iphone, macbook
+
+                        try
+                        {
+                            searchInput = URLEncoder.encode((newValue + ""), "UTF-8");
+                            pbtechSearchInput = searchInput + "+%27";
+                        }
+                        catch (UnsupportedEncodingException e)
+                        {
+                            e.printStackTrace();
+                        }
 
                         pbtechWebview.loadUrl("http://www.pbtech.co.nz/index.php?sf=" + pbtechSearchInput + "&p=search&o=price&d=a");
 

@@ -222,7 +222,7 @@ class pbtechRetrieveFeedTask2 extends AsyncTask<Void, Void, String>
         */
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_pbtech_search_results");
-        preferenceCategory.removeAll();
+        //preferenceCategory.removeAll();
 
         //Toast.makeText(preference.getContext(), "Here "+ priceResultsArray.size(), Toast.LENGTH_LONG).show();
 

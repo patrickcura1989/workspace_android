@@ -16,6 +16,8 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -53,6 +55,14 @@ class harveyRetrieveFeedTask extends AsyncTask<Void, Void, String>
     {
         this.preference = preference;
         this.searchInput = searchInput.replaceAll("\\s+", "+");
+        try
+        {
+            this.searchInput = URLEncoder.encode(searchInput, "UTF-8");
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     public harveyRetrieveFeedTask()
@@ -165,7 +175,7 @@ class harveyRetrieveFeedTask extends AsyncTask<Void, Void, String>
         //System.out.println(result);
         PreferenceManager preferenceManager = preference.getPreferenceManager();
         PreferenceCategory preferenceCategory = (PreferenceCategory) preferenceManager.findPreference("pref_key_harvey_search_results");
-        preferenceCategory.removeAll();
+        //preferenceCategory.removeAll();
 
         //Toast.makeText(preference.getContext(), "Here "+ priceResultsArray.size(), Toast.LENGTH_LONG).show();
 
